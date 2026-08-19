@@ -13,9 +13,8 @@
 # If `--stage` argument is provided, each matching decompilation will be staged with `git add`
 # Once script finishes it will list out each func that can be m2c decompiled.
 
-import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 # Ensure running from repo root
