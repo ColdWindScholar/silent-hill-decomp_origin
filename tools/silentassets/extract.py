@@ -322,7 +322,7 @@ def main():
                 entriesHill.append(entry)
             case _:
                 entriesSilent.append(entry)
-    executable.close
+    executable.close()
     
     _extract(entriesSilent, args.outputFolder, args.silentFile, 2048, release.flags)
     
