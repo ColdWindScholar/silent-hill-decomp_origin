@@ -50,7 +50,7 @@ def find_functions(filters):
 
     return funcs
 
-def try_decompile(func_name: str, func_path: Path = None):
+def try_decompile(func_name: str, func_path: Path | None = None):
     """Try to decompile one function and log success if it works."""
     subprocess.run(["git", "restore", "src/"], check=False)
     # Clear build folders for everything except main EXE, faster than using make clean, and we keep main intact for quicker build iterations
@@ -60,7 +60,6 @@ def try_decompile(func_name: str, func_path: Path = None):
         result = decompile.decompile(str(func_path.resolve()), force=True, resolve_jtbl=False)
     except Exception as e:
         print(f"Error while decompiling {func_name}: {e}")
-        result = decompile.InjectRes.UNKNOWN_ERROR
         return False
 
     if result == decompile.InjectRes.SUCCESS:
@@ -132,11 +131,10 @@ def main():
     print()
     succeeded_paths = []
 
-    count = 0
-    for func_name, func_path in funcs:
+    # what count do? why not len(funcs) directly
+    for index, (func_name, func_path) in enumerate(funcs):
         #if "map6_s04_2" in str(func_path):
-        print(f"=== ({count+1}/{len(funcs)}/{len(succeeded_paths)}) Decompiling {'/'.join(func_path.parts[-2:])} ===")
-        count = count + 1
+        print(f"=== ({index+1}/{len(funcs)}/{len(succeeded_paths)}) Decompiling {'/'.join(func_path.parts[-2:])} ===")
         if try_decompile(func_name, func_path):
             succeeded_paths.append(func_path)
             if args.stage:
