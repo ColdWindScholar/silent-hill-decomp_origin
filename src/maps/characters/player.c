@@ -110,7 +110,7 @@ void sharedFunc_800D1C38_0_s00(s_SubCharacter* player, s_PlayerExtra* extra, GsC
 #endif
 
 #if defined(MAP0_S01)
-    if (g_SysWork.playerWork.extra.state == PlayerState_Unk53)
+    if (g_SysWork.playerWork.extra.state == PlayerState_WalkForward)
     {
         cond = false;
     }
@@ -129,8 +129,8 @@ void sharedFunc_800D1C38_0_s00(s_SubCharacter* player, s_PlayerExtra* extra, GsC
         moveOffsetZ = Q12_MULT(player->moveSpeed, moveOffsetZ);
 
         // Compute displacement alpha from ground slope.
-        moveOffsetAlphaX = Math_Cos(ABS(surface.tiltAngleX) >> 3); // `/ 8`.
-        moveOffsetAlphaZ = Math_Cos(ABS(surface.tiltAngleZ) >> 3); // `/ 8`.
+        moveOffsetAlphaX = Math_Cos(DIV_FAST(ABS(surface.tiltAngleX), 8));
+        moveOffsetAlphaZ = Math_Cos(DIV_FAST(ABS(surface.tiltAngleZ), 8));
 
         // Compute adjusted displacement.
         adjMoveOffsetX = Q12_MULT(Q12_MULT(moveOffsetX, moveOffsetAlphaX), moveOffsetAlphaX);
@@ -217,10 +217,10 @@ void sharedFunc_800D1C38_0_s00(s_SubCharacter* player, s_PlayerExtra* extra, GsC
     boneCoords[HarryBone_Root].coord.t[2] = Q12_TO_Q8(player->position.vz);
 }
 
-void sharedFunc_800D209C_0_s00(void)
+void Player_CutsceneWeaponUnequip(void)
 {
     g_SysWork.playerCombat.weaponAttack = NO_VALUE;
-    g_SavegamePtr->equippedWeapon         = InvItemId_Unequipped;
+    g_SavegamePtr->equippedWeapon       = InvItemId_Unequipped;
 
     Player_ControlFreeze();
     Player_AnimStateSet(PlayerState_Unk84);
@@ -239,9 +239,9 @@ void Player_ControlFreeze(void)
     playerExtra = &g_SysWork.playerWork.extra;
     playerChara = &g_SysWork.playerWork.player;
 
-    sharedData_800DD59C_0_s00 = NO_VALUE;
+    g_Player_PrevWeaponAttack = NO_VALUE;
 
-    D_800C457C                       = 0;
+    g_Player_CutsceneState               = PlayerCutsceneState_RunForward;
     D_800C4588                       = 0;
     g_Player_DisableControl          = true;
     g_Player_IsInWalkToRunTransition = false;
@@ -406,13 +406,13 @@ bool Player_PathWaypointExecute(s32 playerExtraState, VECTOR3* vec, q3_12 angle,
 
             if (playerRotDelta < Q12_ANGLE(0.0f))
             {
-                D_800C457C = 4;
+                g_Player_CutsceneState = PlayerCutsceneState_TurnLeft;
                 Player_ExtraStateSet(playerChara, playerExtra, PlayerState_TurnLeft);
                 D_800C4588 = 2;
             }
             else
             {
-                D_800C457C = 3;
+                g_Player_CutsceneState = PlayerCutsceneState_TurnRight;
                 Player_ExtraStateSet(playerChara, playerExtra, PlayerState_TurnRight);
                 D_800C4588 = 2;
             }
@@ -440,12 +440,12 @@ bool Player_PathWaypointExecute(s32 playerExtraState, VECTOR3* vec, q3_12 angle,
             Player_ExtraStateSet(playerChara, playerExtra, playerExtraState);
             switch (playerExtraState)
             {
-                case PlayerState_Unk54:
-                    D_800C457C = 0;
+                case PlayerState_RunForward:
+                    g_Player_CutsceneState = PlayerCutsceneState_RunForward;
                     break;
 
-                case PlayerState_Unk53:
-                    D_800C457C = 1;
+                case PlayerState_WalkForward:
+                    g_Player_CutsceneState = PlayerCutsceneState_WalkForward;
                     break;
             }
 
@@ -549,12 +549,12 @@ bool Player_PathWaypointExecute(s32 playerExtraState, VECTOR3* vec, q3_12 angle,
 
             if (playerRotDelta < Q12_ANGLE(0.0f))
             {
-                D_800C457C = 4;
+                g_Player_CutsceneState = PlayerCutsceneState_TurnLeft;
                 Player_ExtraStateSet(playerChara, playerExtra, PlayerState_TurnLeft);
             }
             else
             {
-                D_800C457C = 3;
+                g_Player_CutsceneState = PlayerCutsceneState_TurnRight;
                 Player_ExtraStateSet(playerChara, playerExtra, PlayerState_TurnRight);
             }
 
@@ -567,7 +567,7 @@ bool Player_PathWaypointExecute(s32 playerExtraState, VECTOR3* vec, q3_12 angle,
             {
                 playerChara->rotation.vy = angle;
                 Player_ExtraStateSet(playerChara, playerExtra, PlayerState_Reset);
-                D_800C457C = 0;
+                g_Player_CutsceneState = PlayerCutsceneState_RunForward;
                 D_800C4588 = 8;
             }
             break;
@@ -597,20 +597,20 @@ void Player_AnimStateSet(s32 playerExtraState)
 
     switch (playerExtraState)
     {
-        case PlayerState_Unk54:
-            D_800C457C = 0;
+        case PlayerState_RunForward:
+            g_Player_CutsceneState = PlayerCutsceneState_RunForward;
             break;
 
-        case PlayerState_Unk53:
-            D_800C457C = 1;
+        case PlayerState_WalkForward:
+            g_Player_CutsceneState = PlayerCutsceneState_WalkForward;
             break;
 
         case PlayerState_TurnRight:
-            D_800C457C = 3;
+            g_Player_CutsceneState = PlayerCutsceneState_TurnRight;
             break;
 
         case PlayerState_TurnLeft:
-            D_800C457C = 4;
+            g_Player_CutsceneState = PlayerCutsceneState_TurnLeft;
             break;
     }
 
@@ -763,7 +763,8 @@ void sharedFunc_800D2E8C_0_s00(q19_12 posX, q19_12 posZ, VECTOR3* vec)
     D_800C45B0.vx = posX;
     D_800C45B0.vz = posZ;
 
-    if (g_SysWork.npcs[0].health <= Q12(0.0f) || g_Player_IsInWalkToRunTransition || playerChara->health <= Q12(0.0f))
+    if (g_SysWork.npcs[0].health <= Q12(0.0f) ||
+        g_Player_IsInWalkToRunTransition || playerChara->health <= Q12(0.0f))
     {
         return;
     }
@@ -773,13 +774,15 @@ void sharedFunc_800D2E8C_0_s00(q19_12 posX, q19_12 posZ, VECTOR3* vec)
 
     if (vecSqr > Q12(0.75f))
     {
-        if (g_SysWork.playerWork.extra.state < PlayerState_DamagePushBack || g_SysWork.playerWork.extra.state >= PlayerState_Unk31)
+        if (g_SysWork.playerWork.extra.state <  PlayerState_DamagePushBack ||
+            g_SysWork.playerWork.extra.state >= PlayerState_Unk31)
         {
             angle = Q12_ANGLE_ABS(Q12_ANGLE_ABS(ratan2(vec->vx, vec->vz)) - (u16)playerChara->rotation.vy);
 
             if (D_800D587C > Q12(1.75f))
             {
-                if (g_SysWork.playerWork.extra.state >= 23 && g_SysWork.playerWork.extra.state < 27)
+                if (g_SysWork.playerWork.extra.state >= 23 &&
+                    g_SysWork.playerWork.extra.state <  27)
                 {
                     playerChara->model.stateStep    = 0;
                     playerChara->model.controlState = 0;
@@ -799,7 +802,8 @@ void sharedFunc_800D2E8C_0_s00(q19_12 posX, q19_12 posZ, VECTOR3* vec)
                 Player_ExtraStateSet(playerChara, playerExtra, playerExtraState);
                 Sfx_WithFlagsPlay(Sfx_Unk1326, &playerChara->position, Q8(1.0f / 8.0f), SfxFlag_None);
             }
-            else if ((g_SysWork.playerWork.extra.state < PlayerState_DamageTorsoBack || g_SysWork.playerWork.extra.state >= PlayerState_DamageFeetFront) &&
+            else if ((g_SysWork.playerWork.extra.state <  PlayerState_DamageTorsoBack ||
+                      g_SysWork.playerWork.extra.state >= PlayerState_DamageFeetFront) &&
                      g_SysWork.playerWork.extra.state != PlayerState_DamagePushBack &&
                      g_SysWork.playerWork.extra.state != PlayerState_DamagePushFront)
             {
@@ -826,9 +830,9 @@ void sharedFunc_800D2E8C_0_s00(q19_12 posX, q19_12 posZ, VECTOR3* vec)
             g_SysWork.playerWork.player.properties.player.flags &= ~PlayerFlag_Unk12;
 
             playerChara->properties.player.afkTimer = Q12(0.0f);
-            playerChara->properties.player.field_F4    = 0;
-            g_SysWork.playerCombat.isAiming     = false;
-            playerChara->field_44.field_0                 = NO_VALUE;
+            playerChara->properties.player.field_F4 = 0;
+            g_SysWork.playerCombat.isAiming         = false;
+            playerChara->field_44.field_0           = NO_VALUE;
 
             g_SysWork.playerWork.player.properties.player.flags &= ~PlayerFlag_Unk9;
 
@@ -961,10 +965,10 @@ bool sharedFunc_800D2E94_0_s00(void)
         return true;
     }
 
-    npc->model.controlState     = 0;
-    npc->model.stateStep = 0;
-    npc->model.charaId   = Chara_None;
-    npc->health           = Q12(0.0f);
+    npc->model.controlState = 0;
+    npc->model.stateStep    = 0;
+    npc->model.charaId      = Chara_None;
+    npc->health             = Q12(0.0f);
 #endif
     return false;
 }
@@ -990,10 +994,11 @@ void sharedFunc_800D2E9C_0_s00(q19_12* offsetX, q19_12* offsetZ, q3_12* angle)
     bool    isInFront;
 
     g_SysWork.playerWork.player.properties.player.moveSpeed = Q12(0.0f);
-    g_SysWork.playerWork.player.headingAngle                       = Q12_ANGLE(0.0f);
-    isInFront                                                              = Math_AngleFrontCheck(*angle, g_SysWork.playerWork.player.rotation.vy);
+    g_SysWork.playerWork.player.headingAngle                = Q12_ANGLE(0.0f);
+    isInFront                                               = Math_AngleFrontCheck(*angle, g_SysWork.playerWork.player.rotation.vy);
 
-    angle--; // @hack Permuter find, needed for match.
+    // @hack Permuter find, needed for match.
+    angle--;
     angle++;
 
     if (!isInFront)
@@ -1038,24 +1043,24 @@ void sharedFunc_800D2E9C_0_s00(q19_12* offsetX, q19_12* offsetZ, q3_12* angle)
 #endif
 }
 
-s32 sharedFunc_800D2EA4_0_s00(void)
+s32 Player_PropertyField10DGet(void)
 {
     return g_SysWork.playerWork.player.properties.player.field_10D;
 }
 
-void sharedFunc_800D2EB4_0_s00(void)
+void Player_EmptyWeaponHandSet(void)
 {
-    u8 prevVar;
+    u8 prevWeaponAttack;
 
-    prevVar = g_SysWork.playerCombat.weaponAttack;
+    prevWeaponAttack                    = g_SysWork.playerCombat.weaponAttack;
     g_SysWork.playerCombat.weaponAttack = NO_VALUE;
-    sharedData_800DD59C_0_s00 = prevVar;
+    g_Player_PrevWeaponAttack           = prevWeaponAttack;
 
-    WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_1, 1));
+    WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandEmpty));
 }
 
-void sharedFunc_800D2EF4_0_s00(void)
+void Player_WeaponAttackRestore(void)
 {
-    g_SysWork.playerCombat.weaponAttack = sharedData_800DD59C_0_s00;
+    g_SysWork.playerCombat.weaponAttack = g_Player_PrevWeaponAttack;
 }
 

@@ -540,8 +540,8 @@ void func_800DF160(MATRIX* arg0, VECTOR3* arg1, VECTOR3* arg2) // 0x800DF160
 
     if (temp_v0 != 0)
     {
-        var_s2 = FP_TO(temp_s2, Q12_SHIFT) / temp_v0;
-        var_s1 = FP_TO(temp_s1, Q12_SHIFT) / temp_v0;
+        var_s2 = Q12_DIV(temp_s2, temp_v0);
+        var_s1 = Q12_DIV(temp_s1, temp_v0);
     }
     else
     {
@@ -554,8 +554,8 @@ void func_800DF160(MATRIX* arg0, VECTOR3* arg1, VECTOR3* arg2) // 0x800DF160
 
     if (temp_v0_2 != 0)
     {
-        var_a2 = -FP_TO(temp_s3, Q12_SHIFT) / temp_v0_2;
-        var_a1 = FP_TO(temp_v0, Q12_SHIFT) / temp_v0_2;
+        var_a2 = -FP_TO(temp_s3, Q12_SHIFT) / temp_v0_2; // TODO: `Q12_DIV` doesn't match.
+        var_a1 = Q12_DIV(temp_v0, temp_v0_2);
     }
     else
     {
@@ -2135,7 +2135,7 @@ void func_800E2950(void) // 0x800E2950
             Player_ControlFreeze();
 
             func_8007FD4C(true);
-            sharedFunc_800D88AC_0_s00(&g_SysWork.npcs[0]);
+            Chara_MovementReset(&g_SysWork.npcs[0]);
 
             CutsceneBorder_ForceShow();
 
@@ -2379,7 +2379,7 @@ void func_800E3244(void) // 0x800E3244
 
             Sd_SfxStop(Sfx_Unk1617);
             Player_ControlFreeze();
-            sharedFunc_800D88AC_0_s00(&g_SysWork.npcs[0]);
+            Chara_MovementReset(&g_SysWork.npcs[0]);
 
             g_SysWork.npcs[0].health = NO_VALUE;
 
@@ -2402,7 +2402,7 @@ void func_800E3244(void) // 0x800E3244
             g_SysWork.sysFlags |= SysFlag_CutsceneActive;
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             WorldGfx_PlayerHeldItemSet(InvItemId_CutscenePlasticBottle);
             Fs_QueueWaitForEmpty();
             SysWork_StateStepIncrement(0);
@@ -2582,12 +2582,12 @@ void func_800E3244(void) // 0x800E3244
 
             g_Cutscene_Timer = NO_VALUE;
 
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             WorldGfx_PlayerPrevHeldItem(&g_SysWork.playerCombat);
             Player_ControlUnfreeze(false);
             SysWork_StateSetNext(SysState_Gameplay);
 
-            sharedFunc_800D88C0_0_s00(&g_SysWork.npcs[0], false);
+            Chara_AnimReset(&g_SysWork.npcs[0], false);
             vcReturnPreAutoCamWork(true);
             func_8008D448();
             Game_FlashlightAttributesFix();
@@ -2701,7 +2701,7 @@ void func_800E3EF4(void) // 0x800E3EF4
             g_SysWork.lensFlareBoneCoord = NULL;
             g_SysWork.lightIntensity     = Q12(1.0f);
 
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             func_8003D03C();
             SysWork_StateStepIncrement(0);
             break;
@@ -3088,7 +3088,7 @@ void func_800E3EF4(void) // 0x800E3EF4
             Player_ItemRemove(InvItemId_Flauros, 1);
 
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             D_800A9938 = 190000;
 
             SD_Call(19);
@@ -3234,7 +3234,7 @@ void func_800E558C(void) // 0x800E558C
             g_SysWork.sysFlags |= SysFlag_CutsceneActive;
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             Anim_CharaTypeAnimInfoClear();
             Chara_Load(0, Chara_Alessa, &g_SysWork.npcBoneCoordBuffer[0], CHARA_FORCE_FREE_ALL, NULL, NULL);
 
@@ -3288,7 +3288,7 @@ void func_800E558C(void) // 0x800E558C
             SysWork_StateSetNext(SysState_Gameplay);
             Savegame_EventFlagSet(EventFlag_468);
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
 
             D_800ED5F0 = 0;
             break;
@@ -3379,7 +3379,7 @@ void Map_WorldObjectsInit(void) // 0x800E5D44
     func_800E02E0();
     func_800E10F8();
 
-    g_SysWork.npcFlagsId = 3;
+    g_SysWork.npcFlagId = 3;
 }
 
 // rodata at the bottom of this file. TODO: Inline once all users are decomped.
@@ -3432,7 +3432,7 @@ void Map_WorldObjectsUpdate(void) // 0x800E5F54
 
             if (Savegame_EventFlagGet(EventFlag_443))
             {
-                collFlags = CollisionTriggerFlag_1;
+                collFlags = CollisionTriggerFlag_Objects;
 
                 if (g_SysWork.sysState != SysState_EventCallback)
                 {
@@ -3474,7 +3474,7 @@ void Map_WorldObjectsUpdate(void) // 0x800E5F54
                 WorldObjects_Add(&g_WorldObject_SFlauros.object, &g_WorldObject_SFlauros.position, &g_WorldObject_SFlauros.rotation);
             }
 
-            if (!D_800ED840)
+            if (D_800ED840 == 0)
             {
                 SD_Call(Sfx_Unk1616);
                 SD_Call(Sfx_Unk1615);

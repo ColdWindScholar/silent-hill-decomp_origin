@@ -152,7 +152,7 @@ void sharedFunc_800CFF74_5_s00(s_SubCharacter* scratcher)
         scratcher->damage.position.vz += (scratcher->moveSpeed * Math_Cos(scratcher->headingAngle)) >> 14;
 
         prevMoveSpeed           = scratcher->moveSpeed;
-        scratcher->moveSpeed    = FP_TO(Math_Vector2MagCalcSafeQ6(scratcher->damage.position.vx, scratcher->damage.position.vz), Q12_SHIFT) / Q12(4.0f);
+        scratcher->moveSpeed    = Q12_DIV(Math_Vector2MagCalcSafeQ6(scratcher->damage.position.vx, scratcher->damage.position.vz), Q12(4.0f));
         prevHeadingAngle        = scratcher->headingAngle;
         scratcher->headingAngle = ratan2(scratcher->damage.position.vx, scratcher->damage.position.vz);
 
@@ -221,7 +221,7 @@ void sharedFunc_800CFF74_5_s00(s_SubCharacter* scratcher)
                 }
 
             case HangedScratcherControl_8:
-                scratcher->fallSpeed += FP_TO(scratcher->damage.position.vy, Q12_SHIFT) / Q12(4.0f);
+                scratcher->fallSpeed += Q12_DIV(scratcher->damage.position.vy, Q12(4.0f));
                 break;
 
             case HangedScratcherControl_12:
@@ -340,9 +340,9 @@ void HangedScratcher_Control_1(s_SubCharacter* scratcher)
     // TODO: Invert to return early instead?
     if (distToPlayer < Q12(1.0f) &&
         !Los_NpcToPlayerHitCheck(scratcher, &g_SysWork.playerWork.player) &&
-        (((g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) == 2 && func_8006FD90(scratcher, 1, Q12(2.0f), Q12(1.5f))) ||
-         ((g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & (1 << 1)) &&
-          (g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & (1 << 0)) &&
+        (((g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) == SpecialEnvEventFlags_FlashlightAllowed && func_8006FD90(scratcher, 1, Q12(2.0f), Q12(1.5f))) ||
+         ((g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_FlashlightAllowed) &&
+          (g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment) &&
           func_8006FD90(scratcher, 1, Q12(1.5f), Q12(0.3f)))))
     {
         scratcher->model.controlState = HangedScratcherControl_RunForward;
@@ -581,9 +581,9 @@ void HangedScratcher_Control_5(s_SubCharacter* scratcher)
             return;
         }
 
-        if (((g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) == 0x2 && func_8006FD90(scratcher, 1, Q12(1.5f), Q12(0.5f))) ||
-            (((u8)g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x2) &&
-             ((u8)g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x1) && func_8006FD90(scratcher, 1, Q12(1.2f), Q12(0.3f))))
+        if (((g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) == SpecialEnvEventFlags_FlashlightAllowed && func_8006FD90(scratcher, 1, Q12(1.5f), Q12(0.5f))) ||
+            (((u8)g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & SpecialEnvEventFlags_FlashlightAllowed) &&
+             ((u8)g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & SpecialEnvEventFlags_DarkEnvironment) && func_8006FD90(scratcher, 1, Q12(1.2f), Q12(0.3f))))
         {
             scratcher->model.controlState = HangedScratcherControl_WalkForward;
             scratcher->model.anim.status  = ANIM_STATUS(HangedScratcherAnim_WalkForward, false);
@@ -1805,7 +1805,7 @@ void sharedFunc_800D3300_5_s00(s_SubCharacter* scratcher)
             if (scratcherProps.field_103 == 0)
             {
                 Sfx_WithPitchPlay(Sfx_Unk1578, &scratcher->position, Q8(0.125f),
-                              Rng_GenerateUInt(0, 15) + ((FP_TO(scratcher->moveSpeed, Q12_SHIFT) / Q12(3.0f)) >> 5) + 88);
+                                  Rng_GenerateUInt(0, 15) + (Q12_DIV(scratcher->moveSpeed, Q12(3.0f)) >> 5) + 88);
                 scratcherProps.field_103 = 1;
             }
         }
@@ -1819,7 +1819,7 @@ void sharedFunc_800D3300_5_s00(s_SubCharacter* scratcher)
             if (scratcherProps.field_102 == 0)
             {
                 Sfx_WithPitchPlay(Sfx_Unk1578, &scratcher->position, Q8(0.125f),
-                              Rng_GenerateUInt(0, 15) + ((FP_TO(scratcher->moveSpeed, Q12_SHIFT) / Q12(3.0f)) >> 5) + 88);
+                                  Rng_GenerateUInt(0, 15) + (Q12_DIV(scratcher->moveSpeed, Q12(3.0f)) >> 5) + 88);
                 scratcherProps.field_102 = 1;
             }
         }
@@ -1835,7 +1835,7 @@ void sharedFunc_800D3300_5_s00(s_SubCharacter* scratcher)
             if (scratcherProps.field_103 == 0)
             {
                 Sfx_WithPitchPlay(Sfx_Unk1578, &scratcher->position, Q8(0.5f),
-                              Rng_GenerateUInt(0, 15) + ((FP_TO(scratcher->moveSpeed, Q12_SHIFT) / Q12(2.8f)) >> 5) + 120);
+                                  Rng_GenerateUInt(0, 15) + (Q12_DIV(scratcher->moveSpeed, Q12(2.8f)) >> 5) + 120);
                 scratcherProps.field_103 = 1;
             }
         }
@@ -1849,7 +1849,7 @@ void sharedFunc_800D3300_5_s00(s_SubCharacter* scratcher)
             if (scratcherProps.field_102 == 0)
             {
                 Sfx_WithPitchPlay(Sfx_Unk1578, &scratcher->position, Q8(0.5f),
-                              Rng_GenerateUInt(0, 15) + ((FP_TO(scratcher->moveSpeed, Q12_SHIFT) / Q12(2.8f)) >> 5) + 120);
+                                  Rng_GenerateUInt(0, 15) + (Q12_DIV(scratcher->moveSpeed, Q12(2.8f)) >> 5) + 120);
                 scratcherProps.field_102 = 1;
             }
         }

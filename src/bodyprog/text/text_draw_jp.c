@@ -8,32 +8,23 @@
 #include "bodyprog/screen/screen_draw.h"
 #include "bodyprog/text/text_draw.h"
 
-// JPN releases seem to use much different text draw functions.
+// TODO: JPN releases seem to use much different text draw functions.
 // Some functions from USA are still included, but in a different order to USA.
 // Unsure if these can be merged into same .c, might need to be kept seperate.
 
-extern s_800C38B0 D_800C38B0; // 0x800C5E18 in JPN
+extern s_MapMsgLine g_MapMsg_ActiveLine; // 0x800C5E18 in JPN.
 
-DVECTOR g_StringPosition;
-
-s32 g_StringPositionX1;
-
-/** `e_ColorId` */
-static s16 g_StringColorId = StringColorId_White;
-
+DVECTOR    g_StringPosition;
+s32        g_StringPositionX1;
+static s16 g_StringColorId = StringColorId_White; /** `e_ColorId` */
 // 2 bytes of padding.
-
-/** Text index 2D layer.
- * If modifying `Gfx_StringSetPosition`, when setting it to
- * a value lower than 6, text will not be affected by the fade effect.
- */
-static s32 g_Strings2dLayerIdx = 6;
+static s32 g_StringLayerIdx = DEFAULT_TEXT_LAYER_IDX;
 
 // TODO: Unsure if these correspond to variables in USA.
-extern s16 D_800AF83C; // Set by `Gfx_StringSetColor_JP`
+extern s16 D_800AF83C; // Set by `Gfx_StringColorSet_JP`
 extern s16 D_800C5DEC;
 extern s16 D_800C5DEE;
-extern s16 D_800C391C; // 0x800C5E0C;
+extern s16 g_GlyphSpritePositionX; // 0x800C5E0C;
 extern s16 D_800C391E; // 0x800C5E0E;
 extern DVECTOR D_800C5E10;
 extern s32 D_800C5E14;
@@ -65,10 +56,10 @@ static const u32 STRING_COLORS[StringColorId_Count] = {
 
 const u32 __pad_rodata_80025DCC[2] = { 0, 0 };
 
-void Gfx_StringSetPosition(s32 x, s32 y) // 0x8004A5B0
+void Gfx_StringPositionSet(s32 x, s32 y) // 0x8004A5B0
 {
-    #define OFFSET_X SCREEN_POSITION_X(50.0f)
-    #define OFFSET_Y SCREEN_POSITION_Y(47.0f)
+    #define OFFSET_X (SCREEN_WIDTH / 2)
+    #define OFFSET_Y 112
 
     if (x != NO_VALUE)
     {
@@ -81,23 +72,23 @@ void Gfx_StringSetPosition(s32 x, s32 y) // 0x8004A5B0
         g_StringPosition.vy = y - OFFSET_Y;
     }
 
-    g_Strings2dLayerIdx = 6;
+    g_StringLayerIdx = DEFAULT_TEXT_LAYER_IDX;
 
     #undef OFFSET_X
     #undef OFFSET_Y
 }
 
-void Gfx_Strings2dLayerIdxSet(s32 idx) // 0x8004A5F4
+void Gfx_StringLayerIdxSet(s32 idx) // 0x8004A5F4
 {
-    g_Strings2dLayerIdx = idx;
+    g_StringLayerIdx = idx;
 }
 
-void Gfx_StringsReset2dLayerIdx(void) // 0x8004A600
+void Gfx_StringLayerIdxReset(void) // 0x8004A600
 {
-    g_Strings2dLayerIdx = 6;
+    g_StringLayerIdx = DEFAULT_TEXT_LAYER_IDX;
 }
 
-void Gfx_StringSetColor(s16 colorId) // 0x8004A610
+void Gfx_StringColorSet(s16 colorId) // 0x8004A610
 {
     g_StringColorId = colorId;
 }
@@ -142,9 +133,9 @@ bool Gfx_StringDraw(char* str, s32 strLength) // 0x8004A61C
     posY = g_StringPosition.vy;
 
     glyphColor = STRING_COLORS[g_StringColorId];
-    ot         = &g_OtTags0[g_ActiveBufferIdx][g_Strings2dLayerIdx];
+    ot         = &g_OtTags0[g_ActiveBufferIdx][g_StringLayerIdx];
 
-    if (!g_SysWork.enableHighResGlyphs)
+    if (!g_SysWork.enableHalfHeightGlyphs)
     {
         packet = GsOUT_PACKET_P;
     }
@@ -187,7 +178,7 @@ bool Gfx_StringDraw(char* str, s32 strLength) // 0x8004A61C
             sizeCpy--;
 
             // Draw glyph sprite.
-            if (g_SysWork.enableHighResGlyphs)
+            if (g_SysWork.enableHalfHeightGlyphs)
             {
                 glyphPoly = (POLY_FT4*)GsOUT_PACKET_P;
 
@@ -262,13 +253,13 @@ bool Gfx_StringDraw(char* str, s32 strLength) // 0x8004A61C
         strCpy++;
     }
 
-    if (!g_SysWork.enableHighResGlyphs)
+    if (!g_SysWork.enableHalfHeightGlyphs)
     {
         GsOUT_PACKET_P = packet;
     }
 
     // Reset base string position?
-    *((u32*)&g_StringPosition) = (posX & 0xFFFF) + (posY << 16);
+    Math_SetDVectorFast(&g_StringPosition, posX, posY);
 
     return result;
 
@@ -281,19 +272,20 @@ bool Gfx_StringDraw(char* str, s32 strLength) // 0x8004A61C
 void func_8004AA28(void) // 0x8004AA28
 {
     g_MapMsg_GlyphSprite.attribute = 64;
-    g_MapMsg_GlyphSprite.cx = 304;
-    g_MapMsg_GlyphSprite.v = 240;
-    g_MapMsg_GlyphSprite.h = 16;
+    g_MapMsg_GlyphSprite.cx        = 304;
+    g_MapMsg_GlyphSprite.v         = 240;
+    g_MapMsg_GlyphSprite.h         = 16;
+
     func_8003652C();
 }
 
-// TODO: Matches USA `func_8004B6D4`, rename symbols to match.
+// TODO: Matches USA `Gfx_GlyphSprite_PositionSet`, rename symbols to match.
 void func_8004AA6C(s16 x, s16 y) // 0x8004AA6C
 {
     if (x != NO_VALUE)
     {
         D_800C5DEC = x + (-g_GameWork.gsScreenWidth / 2);
-        D_800C391C = D_800C5DEC;
+        g_GlyphSpritePositionX = D_800C5DEC;
     }
 
     if (y != NO_VALUE)
@@ -375,13 +367,13 @@ void func_8004B76C(char* str, bool useFixedWidth) // 0x8004AB04
 
             // Newline.
             case '\n':
-                glyphSprt->x  = D_800C391C;
+                glyphSprt->x  = g_GlyphSpritePositionX;
                 glyphSprt->y += LINE_SPACE_SIZE;
                 break;
 
             // Carriage return.
             case '\r':
-                glyphSprt->x  = D_800C391C;
+                glyphSprt->x  = g_GlyphSpritePositionX;
                 glyphSprt->y -= LINE_SPACE_SIZE;
                 break;
         }
@@ -398,7 +390,7 @@ void func_8004B76C(char* str, bool useFixedWidth) // 0x8004AB04
     #undef ATLAS_COLUMN_COUNT
 }
 
-void Gfx_StringDrawInt(s32 widthMin, s32 val) // 0x8004AD90
+void Gfx_StringDrawInt(s32 lengthMin, s32 val) // 0x8004AD90
 {
     #define GLYPH_SIZE_X       11
     #define ATLAS_COLUMN_COUNT 10
@@ -408,9 +400,9 @@ void Gfx_StringDrawInt(s32 widthMin, s32 val) // 0x8004AD90
     s32   i;
     char* str;
 
-    if (widthMin > 0)
+    if (lengthMin > 0)
     {
-        for (i = 0; i < (widthMin - 1); i++)
+        for (i = 0; i < (lengthMin - 1); i++)
         {
             g_MapMsg_GlyphSprite.x += GLYPH_SIZE_X;
         }
@@ -436,7 +428,7 @@ void Gfx_StringDrawInt(s32 widthMin, s32 val) // 0x8004AD90
         quotient = (val / ATLAS_COLUMN_COUNT) >> 32;
         *str     = (val - (quotient * ATLAS_COLUMN_COUNT)) + '0';
 
-        if (widthMin > 0)
+        if (lengthMin > 0)
         {
             g_MapMsg_GlyphSprite.x -= GLYPH_SIZE_X;
         }
@@ -462,16 +454,16 @@ void Gfx_StringDrawInt(s32 widthMin, s32 val) // 0x8004AD90
     #undef ATLAS_COLUMN_COUNT
 }
 
-void Gfx_MapMsg_DefaultStringInfoSet(void) // 0x8004AEA8
+void Gfx_MapMsg_Reset(void) // 0x8004AEA8
 {
-    D_800C38B0.unused = 0;
-    D_800C38B0.positionIdx = 1;
+    g_MapMsg_ActiveLine.unused = 0;
+    g_MapMsg_ActiveLine.positionIdx = 1;
     D_800C5E1C = 1;
     D_800C5E10.vx = -0x78;
     D_800C5E10.vy = 0x4C;
     D_800C5E14 = -0x78;
     D_800AF83C = StringColorId_White;
-    g_SysWork.enableHighResGlyphs = 0;
+    g_SysWork.enableHalfHeightGlyphs = 0;
 }
 
 void func_8004AF14(s32 x, s32 y) // 0x8004AF14
@@ -487,12 +479,12 @@ void func_8004AF14(s32 x, s32 y) // 0x8004AF14
     }
 }
 
-void Gfx_StringSetColor_JP(s16 colorId) // 0x8004A8DC
+void Gfx_StringColorSet_JP(s16 colorId) // 0x8004A8DC
 {
     D_800AF83C = colorId;
 }
 
-s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
+s32 Gfx_MapMsg_WidthsCompute(s32 mapMsgIdx) // 0x8004AF5C
 {
     RECT  rect;
     s32   i;
@@ -505,9 +497,9 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
     s32   charCode;
     char* mapMsg;
 
-    ret                     = 0;
-    D_800C5E1C              = 1;
-    g_MapMsg_AudioLoadBlock = 0;
+    ret                = 0;
+    D_800C5E1C         = 1;
+    g_MapMsg_AudioType = MapMsgAudioType_None;
 
     for (i = 0; i < FONT_12X16_LINE_COUNT_MAX; i++)
     {
@@ -524,6 +516,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
 
             switch (charCode)
             {
+                // Ignore tabs, newlines, and spaces. TODO: These serve a purpose in Japanese code?
                 case '\t':
                 case '\n':
                 case ' ':
@@ -545,7 +538,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
                     {
                         if (posIdx == 2)
                         {
-                            g_MapMsg_AudioLoadBlock = 3;
+                            g_MapMsg_AudioType = MapMsgAudioType_VoiceStream;
                         }
 
                         while (posIdx != ' ' && posIdx != '\t')
@@ -585,6 +578,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
 
             switch (charCode)
             {
+                // Ignore tabs, newlines, and spaces.
                 case '\t':
                 case '\n':
                 case ' ':
@@ -602,7 +596,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
                             break;
 
                         case MAP_MSG_CODE_NEWLINE:
-                            switch (D_800C38B0.positionIdx)
+                            switch (g_MapMsg_ActiveLine.positionIdx)
                             {
                                 case 4:
                                     setRECT(&rect,
@@ -612,7 +606,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
 
                                 default:
                                     setRECT(&rect,
-                                            j << 6, (D_800C38B0.positionIdx & 0x1) ? (SCREEN_HEIGHT * 2) : FONT_12X16_GLYPH_SIZE_Y,
+                                            j << 6, (g_MapMsg_ActiveLine.positionIdx & 0x1) ? (SCREEN_HEIGHT * 2) : FONT_12X16_GLYPH_SIZE_Y,
                                             i * 3, 16);
                                     break;
                             }
@@ -621,18 +615,19 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
                             break;
 
                         case MAP_MSG_CODE_LINE_POSITION:
-                            D_800C38B0.positionIdx = posIdx;
+                            g_MapMsg_ActiveLine.positionIdx = posIdx;
                             break;
 
                         case MAP_MSG_CODE_JUMP:
+                            // Ignore spaces and tabs.
                             while (posIdx != ' ' && posIdx != '\t')
                             {
                                 posIdx = *++mapMsg;
                             }
                             break;
 
-                        case MAP_MSG_CODE_HIGH_RES:
-                            g_SysWork.enableHighResGlyphs = true;
+                        case MAP_MSG_CODE_HALF_HEIGHT:
+                            g_SysWork.enableHalfHeightGlyphs = true;
                             break;
 
                         case MAP_MSG_CODE_SELECT:
@@ -644,7 +639,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
                     break;
 
                 case 0:
-                    switch (D_800C38B0.positionIdx)
+                    switch (g_MapMsg_ActiveLine.positionIdx)
                     {
                         case 4:
                             setRECT(&rect,
@@ -654,7 +649,7 @@ s32 Gfx_MapMsg_CalculateWidths(s32 mapMsgIdx) // 0x8004AF5C
 
                         default:
                             setRECT(&rect,
-                                    j << 6, (D_800C38B0.positionIdx & 0x1) ? (SCREEN_HEIGHT * 2) : FONT_12X16_GLYPH_SIZE_Y,
+                                    j << 6, (g_MapMsg_ActiveLine.positionIdx & 0x1) ? (SCREEN_HEIGHT * 2) : FONT_12X16_GLYPH_SIZE_Y,
                                     i * 3, 16);
                             break;
                     }
@@ -709,6 +704,7 @@ void func_8004B45C(s32 mapMsgBaseIdx, s32 arg1) // 0x8004B45C
         {
             switch (*mapMsg)
             {
+                // Ignore tabs and spaces.
                 case '\t':
                 case ' ':
                     mapMsg++;
@@ -737,6 +733,7 @@ void func_8004B45C(s32 mapMsgBaseIdx, s32 arg1) // 0x8004B45C
         {
             switch (*mapMsg)
             {
+                // Ignore tabs and spaces.
                 case '\t':
                 case ' ':
                     mapMsg++;
@@ -793,7 +790,7 @@ void func_8004C7E4(void) // 0x8004C7E4
 
     VECTOR3 unused = D_80025F38;
 
-    D_800C3920 = 0x14;
+    D_800C3920 = 20;
 
     func_8004C918(&D_80025EB4, 1, 1, 5);
     func_8004C918(&D_80025EE0, 1, 1, 6);
@@ -804,7 +801,7 @@ void func_8004C870(void)  // 0x8004C870
 {
     extern u8 D_80025F44; // TODO: .rodata? `u8` used as placeholder, likely some kind of struct.
 
-    D_800C3920 = 0x14;
+    D_800C3920 = 20;
     func_8004C918(&D_80025F44, 1, 1, 5);
 }
 

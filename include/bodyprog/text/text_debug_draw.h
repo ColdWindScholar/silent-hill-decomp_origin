@@ -18,13 +18,13 @@ void Text_Debug_Draw(char* str);
 
 /** @brief Converts an integer to a text string, written backwards into scratchpad memory.
  *
- * Handles negative values. Pads with `'\v'` (blank character in debug font) on the left to meet the minimum width.
+ * Handles negative values. Pads with `'\v'` (blank character in debug font) on the left to meet the minimum length.
  *
- * @param widthMin Minimum character width of the output. Padded with blanks if needed.
- * @param val Integer value to convertt. Must be converted from Q19.12 before calling.
+ * @param lengthMin Minimum length.
+ * @param val Integer value to convert.
  * @return Formatted text string in scratchpad memory.
  */
-char* Text_Debug_IntToString(s32 widthMin, s32 val);
+char* Text_Debug_IntToString(s32 lengthMin, s32 val);
 
 #if VERSION_EQUAL_OR_OLDER(PROTO_981216)
 /** @brief Draws a Q19.12 fixed-point value to the screen with a specified number of decimal places.
@@ -46,9 +46,9 @@ void Text_Debug_DrawQ12(s32 offsetX, s32 fracDigits, q19_12 val);
  *
  * @param fieldWidth Total character width for the formatted number.
  * @param fracDigits Number of digits after the decimal point. 0 for no decimal point.
- * @param value Integer value to format. Must be converted from Q19.12 before calling.
+ * @param val Integer value to format. Must be converted from Q19.12 before calling.
  * @param round If `true`, rounds the value by `(value + 5) / 10` before formatting.
  */
-void Text_Debug_DrawDecimal(s32 fieldWidth, s32 fracDigits, s32 value, bool round);
+void Text_Debug_DrawDecimal(s32 fieldWidth, s32 fracDigits, s32 val, bool round);
 
 #endif

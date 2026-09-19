@@ -94,6 +94,20 @@ typedef enum _StalkerAnim
     StalkerAnim_47    = 47
 } e_StalkerAnim;
 
+/** @brief Stalker character swappable mesh IDs. */
+typedef enum _StalkerSwappableMesh
+{
+    StalkerSwappableMesh_Head = 0
+} e_StalkerSwappableMesh;
+
+/** @brief Stalker character variant mesh IDs. */
+typedef enum _StalkerVariantMesh
+{
+    StalkerVariantMesh_None = 0,
+    StalkerVariantMesh_1    = 1, // @unused?
+    StalkerVariantMesh_2    = 2  // Head variant?
+} e_StalkerVariantMesh;
+
 /*s_AnimInfo STALKER_ANIM_INFOS[] = {
     { Anim_BlendLinear, NO_VALUE, false, ANIM_STATUS(0, false), { Q12(0) }, NO_VALUE, 0 },
     { NULL, ANIM_STATUS(0, false), false, ANIM_STATUS(0, false), { Q12(0) }, 0, 0 },
@@ -194,6 +208,12 @@ typedef enum _StalkerAnim
 };*/
 
 extern s_AnimInfo STALKER_ANIM_INFOS[];
+
+// Next 4 set by `Stalker_Update`.
+extern q19_12 sharedData_800E3A20_0_s00; // Health.
+extern q19_12 sharedData_800E3A24_0_s00; // Health.
+extern q19_12 sharedData_800E3A28_0_s00;
+extern q19_12 sharedData_800E3A2C_0_s00;
 
 void Stalker_Control_2(s_SubCharacter* stalker);
 

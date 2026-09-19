@@ -21,8 +21,8 @@ static DVECTOR g_Text_Debug_PositionSet1;
 
 void Text_Debug_PositionSet(s16 x, s16 y) // 0x80031EFC
 {
-    #define OFFSET_X SCREEN_POSITION_X(50.0f)
-    #define OFFSET_Y SCREEN_POSITION_Y(47.0f)
+    #define OFFSET_X (SCREEN_WIDTH / 2)
+    #define OFFSET_Y 112
 
     if (x != NO_VALUE)
     {
@@ -71,7 +71,7 @@ void Text_Debug_Draw(char* str) // 0x80031F40
             default:
                 glyphSprt = (SPRT_8*)packet;
                 addPrimFast(ot, glyphSprt, 3);
-                setRGBC0(glyphSprt, Q8_COLOR(0.5f), Q8_COLOR(0.5f), Q8_COLOR(0.5f), PRIM_RECT | RECT_TEXTURE | RECT_SIZE_8);
+                setRGBC0(glyphSprt, 128, 128, 128, PRIM_RECT | RECT_TEXTURE | RECT_SIZE_8);
                 setXY0Fast(glyphSprt, posX, posY);
 
                 charIdx = (char)toupper(charCode) - '*';
@@ -98,8 +98,8 @@ void Text_Debug_Draw(char* str) // 0x80031F40
         packet += sizeof(SPRT_8);
     }
 
-    *((u32*)&g_Text_Debug_PositionSet1) = (posX & 0xFFFF) + (posY << 16);
-    tPage                               = (DR_TPAGE*)packet;
+    Math_SetDVectorFast(&g_Text_Debug_PositionSet1, posX, posY);
+    tPage = (DR_TPAGE*)packet;
 
     setDrawTPage(tPage, 0, 1, getTPageN(0, 0, 4, 1));
     addPrim(ot, tPage);
@@ -108,7 +108,7 @@ void Text_Debug_Draw(char* str) // 0x80031F40
     GsOUT_PACKET_P = packet;
 }
 
-char* Text_Debug_IntToString(s32 widthMin, s32 val) // 0x80032154
+char* Text_Debug_IntToString(s32 lengthMin, s32 val) // 0x80032154
 {
     bool  isNegative;
     char* str;
@@ -130,7 +130,7 @@ char* Text_Debug_IntToString(s32 widthMin, s32 val) // 0x80032154
     do
     {
         str--;
-        widthMin--;
+        lengthMin--;
         *str = '0' + (val % 10);
         val /= 10;
     }
@@ -140,14 +140,14 @@ char* Text_Debug_IntToString(s32 widthMin, s32 val) // 0x80032154
     {
         str--;
         *str = '-';
-        widthMin--;
+        lengthMin--;
     }
 
-    while (widthMin > 0)
+    while (lengthMin > 0)
     {
         str--;
         *str = '\v';
-        widthMin--;
+        lengthMin--;
     }
 
     return str;

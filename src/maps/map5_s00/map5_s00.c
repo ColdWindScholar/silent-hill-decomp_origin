@@ -571,7 +571,7 @@ void func_800D6B00(void) // 0x800D6B00
 
             CutsceneBorder_ForceShow();
 
-            Sd_PlaySfx(Sfx_Unk1575, Q8(0.0f), Q8(0.5f));
+            Sd_SfxPlay(Sfx_Unk1575, Q8(0.0f), Q8(0.5f));
             SysWork_StateStepIncrement(0);
 
         case 11:
@@ -1018,7 +1018,7 @@ void Map_WorldObjectsInit(void) // 0x800D82A8
         Chara_SpawnFlagsSet(Chara_Creeper, 7, SpawnFlag_None);
         Chara_SpawnFlagsSet(Chara_Creeper, 12, SpawnFlag_None);
 
-        g_SysWork.npcFlagsId = 3;
+        g_SysWork.npcFlagId = 3;
     }
     else if (g_SavegamePtr->gameDifficulty == GameDifficulty_Hard)
     {
@@ -1028,11 +1028,11 @@ void Map_WorldObjectsInit(void) // 0x800D82A8
         Chara_SpawnFlagsSet(Chara_Creeper, 8, SpawnFlag_0 | SpawnFlag_2 | SpawnFlag_3);
         Chara_SpawnFlagsSet(Chara_Creeper, 9, SpawnFlag_0 | SpawnFlag_2 | SpawnFlag_3);
 
-        g_SysWork.npcFlagsId = 4;
+        g_SysWork.npcFlagId = 4;
     }
     else
     {
-        g_SysWork.npcFlagsId = 4;
+        g_SysWork.npcFlagId = 4;
     }
 
     WorldObject_ModelNameSet(&g_CommonWorldObjects[0], g_CommonWorldObjectNames[2]);

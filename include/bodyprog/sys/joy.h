@@ -3,12 +3,9 @@
 
 #include "bodyprog/math/math.h"
 
-/** @brief Handles the general controller
- * handling, controller IO stream and state.
- * Game controller logic seems to have been split among many parts of
- * the game depending on the state or screen the player is using.
- * For example, the controller logic for the inventory screen is handled separately from the
- * one for the in-game state.
+/** @brief Handles the general controller functionality, controller IO stream, and state.
+ * Game controller logic is split between different parts of the game depending on what the user is using.
+ * For example, controller logic in the inventory screen is handled separately from in-game controller logic.
  */
 
 #define INPUT_ACTION_COUNT   14
@@ -141,14 +138,19 @@ extern s_ControllerData* const g_Controller1;
 // FUNCTIONS
 // ==========
 
+/** @brief Initializes controller 1. */
 void Joy_Init(void);
 
+/** @brief Reads analog data from controller 1. */
 void Joy_ReadP1(void);
 
+/** @brief Updates input data for all controllers. */
 void Joy_Update(void);
 
+/** @brief Updates digital data for all controllers, additionally handling special directional cases. */
 void Joy_ControllerDataUpdate(void);
 
+// TODO: Finish demagicking hex values. Does special handling for player movement.
 void ControllerData_AnalogToDigital(s_ControllerData* cont, bool arg1);
 
 /** @brief @unused */

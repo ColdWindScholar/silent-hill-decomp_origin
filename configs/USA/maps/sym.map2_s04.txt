@@ -10,7 +10,7 @@
 //--- PA: 0x001654   VA: 0x800CABCC   subsegment: c, particle
 //-----------------------------------------------------------
 Particle_SystemUpdate            = 0x800CABCC; // type:func
-sharedFunc_800D08B8_0_s00        = 0x800CAD34; // type:func
+Particle_EnvironmentSet          = 0x800CAD34; // type:func
 sharedFunc_800D0A60_0_s00        = 0x800CAEB4; // type:func
 sharedFunc_800D0B18_0_s00        = 0x800CAF6C; // type:func
 Particle_SoundStop               = 0x800CB0D0; // type:func
@@ -22,7 +22,7 @@ Particle_BeamDraw                = 0x800CB968; // type:func
 //---------------------------------------------------------
 sharedFunc_800CDAA8_0_s02        = 0x800CBD54; // type:func
 sharedFunc_800D1C38_0_s00        = 0x800CC048; // type:func
-sharedFunc_800D209C_0_s00        = 0x800CC474; // type:func
+Player_CutsceneWeaponUnequip     = 0x800CC474; // type:func
 Player_MatchArmAnimDisable       = 0x800CC4B0; // type:func
 Player_ControlFreeze             = 0x800CC4BC; // type:func
 Player_ControlUnfreeze           = 0x800CC61C; // type:func
@@ -42,9 +42,9 @@ Player_DamageFeetFront           = 0x800CCA04; // type:func
 sharedFunc_800D2E8C_0_s00        = 0x800CCA0C; // type:func
 sharedFunc_800D2E94_0_s00        = 0x800CCA14; // type:func
 sharedFunc_800D2E9C_0_s00        = 0x800CCA1C; // type:func
-sharedFunc_800D2EA4_0_s00        = 0x800CCA24; // type:func
-sharedFunc_800D2EB4_0_s00        = 0x800CCA34; // type:func
-sharedFunc_800D2EF4_0_s00        = 0x800CCA74; // type:func
+Player_PropertyField10DGet       = 0x800CCA24; // type:func
+Player_EmptyWeaponHandSet        = 0x800CCA34; // type:func
+Player_WeaponAttackRestore       = 0x800CCA74; // type:func
 
 //-----------------------------------------------------------
 //--- PA: 0x003510   VA: 0x800CCA88   subsegment: c, map2_s04
@@ -78,7 +78,7 @@ g_MapHeaderTable_38              = 0x800CDBEC;
 LOADABLE_INVENTORY_ITEMS         = 0x800CDC34;
 sharedData_800DD584_0_s00        = 0x800CDC57;
 sharedData_800DD598_0_s00        = 0x800CDC58;
-sharedData_800DD59C_0_s00        = 0x800CDC5C; // type:u8
+g_Player_PrevWeaponAttack        = 0x800CDC5C; // type:u8
 
 //----------------------------------------------------
 //--- PA: 0x0046E8   VA: 0x800CDC60   subsegment: data

@@ -414,7 +414,7 @@ void Romper_Control_1(s_SubCharacter* romper)
     q19_12 newMoveSpeed;
     s32    var;
 
-    flags = g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & ((1 << 0) | (1 << 1));
+    flags = g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed);
     if (flags == 0)
     {
         var = func_8006FD90(romper, 1, Q12(1.8f), Q12(4.0f));
@@ -495,7 +495,7 @@ void Romper_ControlWalkForward(s_SubCharacter* romper)
     romperProps.field_F0 += sharedFunc_800E939C_2_s02(romper);
     romper->moveSpeed += romperProps.field_F0;
 
-    flags = g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & ((1 << 0) | (1 << 1));
+    flags = g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed);
     if (flags == 0)
     {
         startRunning = func_8006FD90(romper, 1, Q12(1.8f), Q12(4.0f));
@@ -549,7 +549,7 @@ void Romper_Control_3(s_SubCharacter* romper)
     romperProps.field_F0 += sharedFunc_800E94B4_2_s02(romper);
     romper->moveSpeed    += romperProps.field_F0;
 
-    temp_v1_2 = g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 3;
+    temp_v1_2 = g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed);
     if (temp_v1_2 == 0)
     {
         var_s0 = func_8006FD90(romper, 0, Q12(2.5f), Q12(6.0f));
@@ -757,7 +757,7 @@ void Romper_Control_4(s_SubCharacter* romper)
     s32    i;
     q19_12 angle1;
 
-    flags = g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3;
+    flags = g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed);
     if (flags == 0)
     {
         var_s0 = func_8006FD90(romper, 0, Q12(2.5f), Q12(6.0f));
@@ -1715,7 +1715,7 @@ void sharedFunc_800E9714_2_s02(s_SubCharacter* romper)
     sharedFunc_800D2E9C_0_s00(&newPosX, &newPosZ, &headingAngle);
 
     temp_v0 = (FP_TO(Math_Vector2MagCalcSafeQ6(newPosX - romper->position.vx, newPosZ - romper->position.vz), Q12_SHIFT) << 1) / moveSpeed;
-    moveSpeedStep  = FP_TO(moveSpeed, Q12_SHIFT) / temp_v0;
+    moveSpeedStep = Q12_DIV(moveSpeed, temp_v0);
 
     if (moveSpeedStep < Q12(0.0f))
     {

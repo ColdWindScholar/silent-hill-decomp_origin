@@ -59,12 +59,12 @@ typedef enum _ScreenFadeCmd
 /** @brief Screen fade types. */
 typedef enum _ScreenFadeType
 {
-    ScreenFadeType_Black            = 0,
-    ScreenFadeType_White            = 1,
-    ScreenFadeType_ScreenBorders    = 2, // TODO: Investigate. Seems to enable borders around screen?
-    ScreenFadeType_CutsceneBorders  = 3, // TODO: Investigate. Same as `ScreenBorders` but also sets cutscene flag?
+    ScreenFadeType_Black           = 0,
+    ScreenFadeType_White           = 1,
+    ScreenFadeType_ScreenBorders   = 2, // TODO: Investigate. Seems to enable borders around screen?
+    ScreenFadeType_CutsceneBorders = 3, // TODO: Investigate. Same as `ScreenBorders` but also sets cutscene flag?
 
-    ScreenFadeType_Hack             = -1 /** @hack Forces the enum as `s32`. */
+    ScreenFadeType_Hack            = -1 /** @hack Forces the enum as `s32`. */
 } e_ScreenFadeType;
 
 /** @brief Increments the event state step to use on next tick.
@@ -256,7 +256,8 @@ void Event_DisplayMapMsgWithAudio(s32 mapMsgIdx, u8* audioIdx, const u16* audioC
  * @param speedYMax Max Y speed.
  * @param warp If `true`, warp to the position target, otherwise transition over time.
  */
-void Event_CameraPositionSet(VECTOR3* pos, q19_12 offsetOrPosX, q19_12 offsetOrPosY, q19_12 offsetOrPosZ,
+void Event_CameraPositionSet(VECTOR3* pos,
+                             q19_12 offsetOrPosX, q19_12 offsetOrPosY, q19_12 offsetOrPosZ,
                              q19_12 accelXz, q19_12 accelY, q19_12 speedXzMax, q19_12 speedYMax,
                              bool warp);
 
@@ -272,7 +273,8 @@ void Event_CameraPositionSet(VECTOR3* pos, q19_12 offsetOrPosX, q19_12 offsetOrP
  * @param angularSpeedYMax Max angular speed on the Y axis.
  * @param warp If `true`, warp to the look-at target, otherwise transition over time.
  */
-void Event_CameraLookAtSet(VECTOR3* lookAt, q19_12 lookAtOffsetOrPosX, q19_12 lookAtOffsetOrPosY, q19_12 lookAtOffsetOrPosZ,
+void Event_CameraLookAtSet(VECTOR3* lookAt,
+                           q19_12 lookAtOffsetOrPosX, q19_12 lookAtOffsetOrPosY, q19_12 lookAtOffsetOrPosZ,
                            q19_12 angularAccelX, q19_12 angularAccelY, q19_12 angularSpeedXMax, q19_12 angularSpeedYMax,
                            bool warp);
 

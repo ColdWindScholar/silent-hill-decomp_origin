@@ -1506,10 +1506,10 @@ void func_800D8FC0(void) // 0x800D8FC0
 
             // Warp camera.
             Event_CameraPositionSet(NULL,
-                               Event_TweenLinear(Q12(-1.28f), Q12(6.5f), 0) + Q12(163.78f),
-                               Event_TweenLinear(Q12(1.16f), Q12(6.5f), 1) - Q12(2.31f),
-                               Event_TweenLinear(Q12(-4.41f), Q12(6.5f), 2) + Q12(58.91f),
-                               Q12(0.0f), Q12(0.0f), Q12(0.0f), Q12(0.0f), false);
+                                    Event_TweenLinear(Q12(-1.28f), Q12(6.5f), 0) + Q12(163.78f),
+                                    Event_TweenLinear(Q12(1.16f), Q12(6.5f), 1) - Q12(2.31f),
+                                    Event_TweenLinear(Q12(-4.41f), Q12(6.5f), 2) + Q12(58.91f),
+                                    Q12(0.0f), Q12(0.0f), Q12(0.0f), Q12(0.0f), false);
 
             if (g_SysWork.sysStateSteps[0] != 4)
             {
@@ -1691,7 +1691,7 @@ void Map_WorldObjectsUpdate(void) // 0x800D9BB0
                 D_800E05AE += Q12(1.0f);
             }
 
-            Collision_FlagBitsClear(CollisionTriggerFlag_1);
+            Collision_FlagBitsClear(CollisionTriggerFlag_Objects);
             D_800E05A8 += g_DeltaTime;
 
             if (D_800E05AC) {} // @hack
@@ -1712,7 +1712,7 @@ void Map_WorldObjectsUpdate(void) // 0x800D9BB0
             if (D_800E05A8 > Q12(1.0f))
             {
                 // NOTE: Changed return type to `s32` in context.
-                if (sharedFunc_800D2EA4_0_s00())
+                if (Player_PropertyField10DGet())
                 {
                     Savegame_EventFlagSet(EventFlag_322);
                 }
@@ -1742,7 +1742,7 @@ void Map_WorldObjectsUpdate(void) // 0x800D9BB0
         }
         else
         {
-            Collision_FlagBitsClear(CollisionTriggerFlag_1);
+            Collision_FlagBitsClear(CollisionTriggerFlag_Objects);
             WorldObjects_Add(&g_WorldObject_Mal6[1], &g_WorldObject_UnkPos, &g_WorldObject_UnkRot);
         }
     }

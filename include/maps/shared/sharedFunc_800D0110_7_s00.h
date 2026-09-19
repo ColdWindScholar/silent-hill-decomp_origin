@@ -43,7 +43,7 @@ void sharedFunc_800D0110_7_s00(void)
                     break;
 
                 case GameState_SaveScreen:
-                    switch (g_Screen_FadeStatus)
+                    switch (g_ScreenFade_Status)
                     {
                         default:
                             bgmFlags  = (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7);
@@ -93,7 +93,7 @@ void sharedFunc_800D0110_7_s00(void)
                             fadeSpeed = Q12(240.0f);
                             bgmFlags  = (1 << 0) | (1 << 9);
 
-                            if (Sd_ChannelTaskGet() == 0)
+                            if (Sd_MidiChannelTaskGet() == 0)
                             {
                                 Savegame_EventFlagSet(EventFlag_572);
                             }
@@ -109,7 +109,7 @@ void sharedFunc_800D0110_7_s00(void)
                         fadeSpeed = Q12(1.0f);
                         bgmFlags  = (1 << 0) | (1 << 9);
 
-                        if (Sd_ChannelTaskGet() == 0)
+                        if (Sd_MidiChannelTaskGet() == 0)
                         {
                             Savegame_EventFlagSet(EventFlag_572);
                         }
@@ -523,14 +523,14 @@ void sharedFunc_800D0110_7_s00(void)
 
                 if (g_SysWork.bgmLayerVolumes[0] != Q12(1.0f))
                 {
-                    if (Sd_ChannelTaskGet() == 0)
+                    if (Sd_MidiChannelTaskGet() == 0)
                     {
                         Sd_BgmChannelSet();
                     }
                     else
                     {
-                        Sd_ChannelsVolumeSet(0, 0x7F);
-                        Sd_ChannelsVolumeSet(1, 1);
+                        Sd_MidiChannelsVolumeSet(0, 0x7F);
+                        Sd_MidiChannelsVolumeSet(1, 1);
 
                         g_SysWork.bgmLayerVolumes[0] = Q12(1.0f);
                         g_SysWork.bgmLayerVolumes[1] = 32;

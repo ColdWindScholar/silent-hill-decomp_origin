@@ -26,7 +26,7 @@
     #define CHARA_CASE(id) default
 #endif
 
-void sharedFunc_800D88AC_0_s00(s_SubCharacter* npc)
+void Chara_MovementReset(s_SubCharacter* npc)
 {
     npc->properties.npc.field_F4         = 0;
     npc->properties.npc.freeze           = false;
@@ -34,13 +34,13 @@ void sharedFunc_800D88AC_0_s00(s_SubCharacter* npc)
     npc->properties.npc.moveSpeed        = Q12(0.0f);
 }
 
-void sharedFunc_800D88C0_0_s00(s_SubCharacter* npc, bool cond)
+void Chara_AnimReset(s_SubCharacter* npc, bool cond)
 {
     npc->properties.npc.field_F4 = 1;
 
     if (cond)
     {
-        npc->model.anim.status      = ANIM_STATUS(HarryAnim_TransitionToStill, true);
+        npc->model.anim.status      = ANIM_STATUS(1, true);
         npc->model.anim.keyframeIdx = 0;
         npc->model.anim.time        = Q12(0.0f);
         npc->model.anim.alpha       = Q12(1.0f);
@@ -63,7 +63,7 @@ void Chara_AnimStateSet(s_SubCharacter* npc, s32 controlState)
     npc->model.stateStep                  = 0;
 }
 
-void Chara_AnimReset(s_SubCharacter* npc)
+void Chara_ControlStateReset(s_SubCharacter* npc)
 {
     npc->properties.npc.resetControlState = true;
 }
@@ -430,7 +430,7 @@ void Chara_InvisibleSet(s_SubCharacter* chara)
     chara->model.anim.flags &= ~AnimFlag_Visible;
 }
 
-bool sharedFunc_800D908C_0_s00(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx0, s32 keyframeIdx1, s32 sfxId, s32 pitch)
+bool Npc_FootstepSoundPlay(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx0, s32 keyframeIdx1, s32 sfxId, s32 pitch)
 {
     // TODO: Seems each of the s_PropsNpcs characters get passed to this func.
     // May share the same `flags` values based on code below?
@@ -471,7 +471,7 @@ bool sharedFunc_800D908C_0_s00(s32 animStatus, s_SubCharacter* chara, s32 keyfra
     return false;
 }
 
-bool sharedFunc_800D9188_0_s00(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx, s32 sfxId)
+bool Npc_SfxPlay(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx, s32 sfxId)
 {
     if (chara->model.anim.status == animStatus)
     {

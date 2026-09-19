@@ -51,6 +51,20 @@ typedef enum _SplitHeadAnim
     SplitHeadAnim_14          = 14  // something idle?
 } e_SplitHeadAnim;
 
+/** @brief Split Head character swappable mesh IDs. */
+typedef enum _SplitHeadSwappableMesh
+{
+    SplitHeadSwappableMesh_Head = 0
+} e_SplitHeadSwappableMesh;
+
+/** @brief Split Head character variant mesh IDs. */
+typedef enum _SplitHeadVariantMesh
+{
+    SplitHeadVariantMesh_None = 0,
+    SplitHeadVariantMesh_1    = 1, // } Open and closed heads?
+    SplitHeadVariantMesh_2    = 2  // }
+} e_SplitHeadVariantMesh;
+
 typedef struct
 {
     s32 field_0; // Distance/Magnitude?
@@ -61,6 +75,12 @@ typedef struct
     u8  field_E;
     s8  unk_F;
 } s_sharedFunc_800D4594_1_s05;
+
+typedef struct
+{
+    SVECTOR3 vec;
+    s16      idx;
+} s_sharedData_800D5AB0_1_s05;
 
 /*s_AnimInfo SPLIT_HEAD_ANIM_INFOS[] = {
     { Anim_BlendLinear, NO_VALUE, false, ANIM_STATUS(0, false), { Q12(0) }, NO_VALUE, 0 },
@@ -100,9 +120,33 @@ extern s_AnimInfo SPLIT_HEAD_ANIM_INFOS[];
 /** Set to Split Head bone coords. */
 extern GsCOORDINATE2* sharedData_800D8610_1_s05;
 
-extern q19_12 sharedData_800D8684_1_s05; // Offset X.
-extern q19_12 sharedData_800D8688_1_s05; // Offset Z.
+extern q3_12 g_SplitHead_MovementOffsetX;
+extern q3_12 g_SplitHead_MovementOffsetZ;
 
+extern q19_12 g_SplitHead_MovementAnimDuration;
+
+extern s16 sharedData_800D5A8C_1_s05;
+
+extern u8 sharedData_800D5AAE_1_s05;
+extern u8 sharedData_800D5AAF_1_s05;
+
+extern u8       sharedData_800D5CF8_1_s05[9];
+extern u8       sharedData_800D5D08_1_s05[];
+extern VECTOR3  sharedData_800D8618_1_s05[]; // Size 9. Effects positions??
+extern SVECTOR3 sharedData_800D5A90_1_s05[]; // Q7.8
+
+extern s_sharedData_800D5AB0_1_s05 sharedData_800D5AB0_1_s05[];
+extern s16                         sharedData_800D5BE0_1_s05[6][3];
+
+extern q19_12 sharedData_800D8684_1_s05; // Offset X for player target.
+extern q19_12 sharedData_800D8688_1_s05; // Offset Z for player target.
+
+/** @brief Updates an active Split Head character.
+ *
+ * @param splitHead Split Head character to update.
+ * @param anmHdr Character animation data.
+ * @param boneCoords Character bone coords.
+ */
 void SplitHead_Update(s_SubCharacter* splitHead, s_AnmHeader* anmHdr, GsCOORDINATE2* boneCoords);
 
 void SplitHead_Init(s_SubCharacter* splitHead);
@@ -119,12 +163,13 @@ void SplitHead_Control_2(s_SubCharacter* splitHead);
 
 void SplitHead_Control_3(s_SubCharacter* splitHead);
 
-void sharedFunc_800D267C_1_s05(s_SubCharacter* splitHead);
+void SplitHead_MovementUpdate(s_SubCharacter* splitHead);
 
-void sharedFunc_800D274C_1_s05(s_SubCharacter* splitHead, s_AnmHeader* anmHdr);
+void SplitHead_AnimUpdate(s_SubCharacter* splitHead, s_AnmHeader* anmHdr);
 
 void sharedFunc_800D2D74_1_s05(s_SubCharacter* splitHead);
 
+// Updates something to do with a player target position.
 void sharedFunc_800D3388_1_s05(s_SubCharacter* splitHead, q19_12* offsetX, q19_12* offsetZ);
 
 void SplitHead_Control_4(s_SubCharacter* splitHead);
@@ -144,7 +189,7 @@ void sharedFunc_800D3B30_1_s05(s_SubCharacter* splitHead);
 void sharedFunc_800D4070_1_s05(s_SubCharacter* splitHead);
 
 /** Accumulates an unknown XZ offset. */
-void sharedFunc_800D450C_1_s05(q19_12 offsetX, q19_12 offsetZ);
+void SplitHead_MovementOffsetSet(q19_12 offsetX, q19_12 offsetZ);
 
 bool sharedFunc_800D4530_1_s05(s_SubCharacter* splitHead);
 

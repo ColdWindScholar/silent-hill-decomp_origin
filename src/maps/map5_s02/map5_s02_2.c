@@ -468,10 +468,10 @@ void MapEvent_KaufmannBarFightCutscene(void) // 0x800D5744
 
             func_8007F14C(32);
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             WorldGfx_PlayerHeldItemSet(InvItemId_Handgun);
 
-            g_SysWork.playerWork.player.collision.state = CharaCollisionState_5;
+            g_SysWork.playerWork.player.collision.state = CharaCollisionState_Default;
 
             Event_CharaAnimCmdExecute(CharaAnimCmd_SetState, &g_SysWork.playerWork.player, 153, false);
             D_800D94F4 = 0;
@@ -648,9 +648,9 @@ void MapEvent_KaufmannBarFightCutscene(void) // 0x800D5744
 
             g_Cutscene_Timer = Q12(316.0f);
 
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             WorldGfx_PlayerPrevHeldItem(&g_SysWork.playerCombat);
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             SysWork_StateStepIncrement(0);
 
         case 36:
@@ -698,7 +698,7 @@ void MapEvent_KaufmannBarFightCutscene(void) // 0x800D5744
             }
 
             Chara_ModelCharaIdClear(&g_SysWork.npcs[0], 0, 0);
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             WorldGfx_PlayerPrevHeldItem(&g_SysWork.playerCombat);
 
             g_Cutscene_Timer = Q12(316.0f);
@@ -734,7 +734,7 @@ void MapEvent_KaufmannBarFightCutscene(void) // 0x800D5744
             g_SysWork.playerWork.player.position.vy = Q12(0.0f);
 
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             func_8007F14C((u8)g_SysWork.playerCombat.weaponAttack);
 
             Model_AnimFlagsSet(&g_SysWork.playerWork.player.model, 2);
@@ -847,7 +847,7 @@ void Map_WorldObjectsUpdate(void) // 0x800D68FC
                 WorldObjects_Add(&g_WorldObject_Key.object, &g_WorldObject_Key.position, &g_WorldObject_Key.rotation);
             }
 
-            Collision_FlagBitsSet(CollisionTriggerFlag_1);
+            Collision_FlagBitsSet(CollisionTriggerFlag_Objects);
         }
 
         if (Savegame_EventFlagGet(EventFlag_M5S02_UsedSafeKey))

@@ -3714,7 +3714,7 @@ void Particle_BoundaryClamp(VECTOR3* point, VECTOR3* lineStart, VECTOR3* lineEnd
 }
 #endif
 
-void sharedFunc_800D08B8_0_s00(s8 arg0, u32 arg1)
+void Particle_EnvironmentSet(s8 arg0, u32 arg1)
 {
     s32 temp_a1;
     s32 shiftAmount;
@@ -4271,7 +4271,7 @@ void Particle_BeamDraw(const VECTOR3* from, const VECTOR3* to)
     gte_stsxy(&prim->x1);
 
     // Return if `depth / 2` isn't in range `[1, 158]`.
-    if ((depth >> 1) < 1 || (depth >> 1) > 158)
+    if (DIV_FAST(depth, 2) < 1 || DIV_FAST(depth, 2) > 158)
     {
         return;
     }
@@ -4290,7 +4290,7 @@ void Particle_BeamDraw(const VECTOR3* from, const VECTOR3* to)
             break;
 
         case 2:
-            if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & (1 << 1)))
+            if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_FlashlightAllowed))
             {
                 prim->r0 = 0xFF;
                 prim->g0 = 0xFF;
@@ -4302,13 +4302,13 @@ void Particle_BeamDraw(const VECTOR3* from, const VECTOR3* to)
                 prim->g0 = 0xFF;
                 prim->b0 = 0xFF;
             }
-            else if (g_SysWork.field_2388.field_1C[0].effectsInfo.field_0.s_field_0.field_0 & 1)
+            else if (g_SysWork.field_2388.field_1C[0].effectsInfo.flags.field_00[0] & 1)
             {
                 prim->r0 = 0x30;
                 prim->g0 = 0x30;
                 prim->b0 = 0x30;
             }
-            else if (!(g_SysWork.field_2388.field_1C[1].effectsInfo.field_0.s_field_0.field_0 & (1 << 0)))
+            else if (!(g_SysWork.field_2388.field_1C[1].effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment))
             {
                 prim->r0 = 0xFF;
                 prim->g0 = 0xFF;

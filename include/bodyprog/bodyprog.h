@@ -85,11 +85,11 @@ typedef enum _MainMenuEntry
 
 typedef enum _MainMenuState
 {
-    MenuState_Start              = 0,
-    MenuState_Main               = 1,
-    MenuState_LoadGame           = 2,
-    MenuState_DifficultySelector = 3,
-    MenuState_NewGameStart       = 4
+    MainMenuState_Start              = 0,
+    MainMenuState_Main               = 1,
+    MainMenuState_LoadGame           = 2,
+    MainMenuState_DifficultySelector = 3,
+    MainMenuState_NewGameStart       = 4
 } e_MainMenuState;
 
 /** Used by `func_8003F654` to cast a specific field to the desired type. */
@@ -195,14 +195,15 @@ typedef struct
 } s_800AD4C8;
 STATIC_ASSERT_SIZEOF(s_800AD4C8, 24);
 
-typedef struct _RadioNpcInfo
+/** @brief Radio noise data for nearby enemies. */
+typedef struct _RadioNoise
 {
     /* 0x0 */ s8 prevIdx;
     /* 0x1 */ s8 idx;
     /* 0x2 */ s8 closeNpcInfoIdx;
-    /* 0x3 */ s8 field_3;
-} s_RadioNpcInfo;
-STATIC_ASSERT_SIZEOF(s_RadioNpcInfo, 4);
+    /* 0x3 */ s8 unused; /** @unused */
+} s_RadioNoise;
+STATIC_ASSERT_SIZEOF(s_RadioNoise, 4);
 
 typedef struct
 {
@@ -386,7 +387,7 @@ typedef struct
 typedef struct
 {
     /* 0x0   */ VECTOR3 field_0; // Q23.8 | Position.
-    /* 0xC   */ MATRIX  field_C;
+    /* 0xC   */ MATRIX  worldToScreenMat;
     /* 0x2C  */ s32     field_2C;
     /* 0x30  */ DVECTOR field_30;
     /* 0x34  */ q3_12   field_34[24];
@@ -394,12 +395,12 @@ typedef struct
     /* 0x94  */ q3_12   field_94[24];
     /* 0xC4  */ s16     field_C4;
     /* 0xC6  */ s16     field_C6;
-    /* 0xC8  */ s16     field_C8;
-    /* 0xCA  */ s16     field_CA;
-    /* 0xCC  */ s16     field_CC;
+    /* 0xC8  */ q3_12   field_C8;
+    /* 0xCA  */ q3_12   field_CA;
+    /* 0xCC  */ q3_12   field_CC; // Angle?
     /* 0xCE  */ s16     field_CE;
-    /* 0xD0  */ s32     field_D0;
-    /* 0xD4  */ s32     field_D4;
+    /* 0xD0  */ q19_12  field_D0;
+    /* 0xD4  */ q19_12  field_D4;
     /* 0xD8  */ s32     field_D8;
     /* 0xDC  */ s16     field_DC[4];
     /* 0xE4  */ s16     field_E4[4];
@@ -769,7 +770,7 @@ extern u32 D_800A9FB0;
 
 extern s32 D_800A9FB4[];
 
-extern u8 D_800AA604[41][16];
+extern u8 g_Sd_SongsChannelsForLayers[41][16];
 
 extern u8 D_800AE185;
 
@@ -777,7 +778,7 @@ extern u8 D_800AE186;
 
 extern s8 __pad_bss_800BCD81[3];
 
-extern s32 g_DeltaTimeCpy;
+extern q19_12 g_DeltaTimeCpy;
 
 extern s32 __pad_bss_800BCD88[2];
 
@@ -785,17 +786,16 @@ extern s_EventData* g_ItemTriggerEvents[];
 
 extern s32 __pad_bss_800BCD94[5];
 
-/** Radio SFX data. */
-extern s_RadioNpcInfo g_RadioNpcInfos[2];
+extern s_RadioNoise g_RadioNoise[2];
 
-extern s_MapPoint2d D_800BCDB0;
+extern s_MapPoint2d g_MapPoint;
 
 extern s32 __pad_bss_800BCDD0;
 
 /** Related to special item interactions. */
 extern s32 g_ItemTriggerItemIds[5];
 
-extern u8 D_800BCDD4;
+extern u8 g_MapAreaLoadCounter;
 
 extern s8 __pad_bss_800BCDD5[3];
 
@@ -835,6 +835,10 @@ extern s8* D_800BCDE0; // Type assumed.
 /** Angles. */
 extern s16 D_800BCDE8[8];
 
+extern u16 g_CollisionTriggerFlags;
+
+extern s16 __pad_800BCE14;
+
 extern s_WorldGfxWork g_WorldGfxWork;
 
 extern s8* D_800C15B0;
@@ -852,7 +856,7 @@ extern s8 D_800C39A0;
  */
 // extern s_WorldEnvWork g_WorldEnvWork;
 
-extern GsCOORDINATE2* D_800C42B8; // Set to view coord.
+extern GsCOORDINATE2* g_ViewCoord;
 
 extern q4_12 g_Player_RotationDeltaToTargetY;
 extern q4_12 g_Player_RotationDeltaToTargetX;
@@ -925,13 +929,12 @@ extern s16 SQRT[100];
 /** @brief Draws a palette of colors in the frame buffer. */
 void func_8003652C(void);
 
-/** @brief @unused Loading screen text.
+/** @brief @unused Draws loading screen text.
  *
- * Just like in earlier builds of Silent Hill 2, the game
- * was intended to show a black screen with
- * "Now loading" text in middle of the screen.
+ * Just like in earlier builds of Silent Hill 2, the game was intended to show a black screen with "Now loading." text
+ * in middle of the screen.
  */
-void func_80032CE8(void);
+void GameFs_LoadingTextDraw(void);
 
 void func_80032D1C(void);
 
@@ -946,6 +949,10 @@ s32 Map_TypeGet(void);
 
 void Collision_FlagsLocationUpdate(const s_SubCharacter* chara);
 
+/** @brief Frees a character model.
+ *
+ * @param model Character model to release.
+ */
 void Chara_ModelFree(s_CharaModel* model);
 
 void WorldGfx_MapInit(s_MapOverlayHdr* mapHdr, s32 playerPosX, s32 playerPosZ);
@@ -956,14 +963,26 @@ void WorldGfx_MapInit(s_MapOverlayHdr* mapHdr, s32 playerPosX, s32 playerPosZ);
  */
 bool WorldGfx_ChunkInitCheck(void);
 
-void WorldGfx_Draw(bool arg0);
+/** @brief Draws world objects, chunks, and 2D screen effects.
+ *
+ * @param otShift Ordering table shift.
+ */
+void WorldGfx_Draw(s32 otShift);
 
-void WorldObject_ModelNameSet(s_WorldObjectModel* model, char* newStr);
+/** @brief Sets the name of a world object model.
+ *
+ * @param model World object model to update.
+ * @param name Name to set.
+ */
+void WorldObject_ModelNameSet(s_WorldObjectModel* model, char* name);
 
 /** Submits a world object model to draw. */
 void WorldObjects_Add(s_WorldObjectModel* model, const VECTOR3* pos, const SVECTOR3* rot);
 
-/** @unused Returns held item ID. */
+/** @brief @unused Returns held item ID.
+ *
+ * @return Held item ID.
+ */
 s32 WorldGfx_HeldItemIdGet(void);
 
 s32 WorldGfx_PlayerPrevHeldItem(s_PlayerCombat* combat);
@@ -996,8 +1015,13 @@ void WorldGfx_CharaModelMaterialSet(e_CharaId charaId, s32 blendMode);
 /** @brief Makes a character transparent. */
 void WorldGfx_CharaModelTransparentSet(e_CharaId charaId, bool isTransparent);
 
+/** @brief Frees a registered character model.
+ *
+ * @param model Character model to release.
+ */
 void WorldGfx_CharaFree(s_CharaModel* model);
 
+/** @brief Loads the Harry character model. */
 void WorldGfx_HarryCharaLoad(void);
 
 /** @brief Loads default characters in the map overlay.
@@ -1009,9 +1033,20 @@ s32 WorldGfx_MapInitCharaLoad(s_MapOverlayHdr* mapHdr);
 
 void WorldGfx_CharaLmBufferAssign(s8 forceFree);
 
-s32 func_8003DD74(e_CharaId charaId, s32 arg1);
+/** @brief Gets the Y position of a color palette in VRAM.
+ *
+ * @param charaId @unused Character ID.
+ * @param paletteIdx Color palette index.
+ * @return CLUT Y position in VRAM.
+ */
+s32 WorldGfx_CharaClutYGet(e_CharaId charaId, s32 paletteIdx);
 
-void WorldGfx_HeldItemAttach(e_CharaId charaId, s32 modelBone); // Called by some chara init funcs.
+/** @brief Handles a mesh swap for a character.
+ *
+ * @param charaId ID of the character on which to perform the mesh swap.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_CharaMeshSwap(e_CharaId charaId, s32 meshSwapStatus);
 
 bool Chara_ModelLoadedCheck(e_CharaId charaId);
 
@@ -1194,7 +1229,7 @@ bool WorldMap_NextChunkLoadCheck(void);
 /** Checks if a position is within the current map chunk. */
 bool WorldMap_CloseChunkEdgeCheck(q19_12 posX, q19_12 posZ);
 
-void WorldMap_ChunksDraw(GsOT* ot, bool arg1);
+void WorldMap_ChunksDraw(GsOT* ot, s32 otShift);
 
 bool WorldMap_ChunkPositionMatchCheck(s_MapChunk* chunk, s_WorldMapWork* terrain);
 
@@ -1235,13 +1270,13 @@ void func_80044044(s_IpdHeader* ipd, s32 chunkX, s32 chunkZ);
 
 /** @brief Draws an IPD chunk.
  *
- * @param ipdHdr Header of the IPD chunk to draw.
+ * @param ipdHdr IPD chunk data to draw.
  * @param posX X world position.
  * @param posZ Z world position.
  * @param ot Ordering table.
- * @param arg4 TODO
+ * @param otShift Ordering table shift.
  */
-void WorldMap_Draw(s_IpdHeader* ipdHdr, q19_12 posX, q19_12 posZ, GsOT* ot, bool arg4);
+void WorldMap_Draw(s_IpdHeader* ipdHdr, q19_12 posX, q19_12 posZ, GsOT* ot, s32 otShift);
 
 /** @brief Checks if an IPD chunk subcell is visible.
  *
@@ -1254,9 +1289,9 @@ bool WorldMap_SubcellVisibleCheck(s_IpdModelBuffer* modelBuf, q7_8 subcellX, q7_
 
 void Anim_BoneInit(s_AnmHeader* anmHdr, GsCOORDINATE2* boneCoords);
 
-s_AnimInfo* func_80044918(s_ModelAnim* anim);
-
 void Anim_BoneUpdate(s_AnmHeader* anmHdr, GsCOORDINATE2* boneCoords, s32 keyframe0, s32 keyframe1, q19_12 alpha);
+
+s_AnimInfo* func_80044918(s_ModelAnim* anim);
 
 void func_80044950(s_SubCharacter* chara, s_AnmHeader* anmHdr, GsCOORDINATE2* coords);
 
@@ -1274,7 +1309,7 @@ q19_12 Anim_DurationGet(s_Model* unused, s_AnimInfo* animInfo);
  * @note Used for one-shot actions such as stopping and attacking.
  *
  * @param model Character model to animate.
- * @param anmHdr Active animation header.
+ * @param anmHdr Character animation data.
  * @param boneCoords Character model bone coords.
  * @param animInfo Active character animation info.
  */
@@ -1286,7 +1321,7 @@ void Anim_PlaybackOnce(s_Model* model, s_AnmHeader* anmHdr, GsCOORDINATE2* boneC
  * @note Used for looped actions such as running and walking.
  *
  * @param model Character model to animate.
- * @param anmHdr Active animation header.
+ * @param anmHdr Character animation data.
  * @param boneCoords Character model bone coords.
  * @param animInfo Character animation info.
  */
@@ -1298,7 +1333,7 @@ void Anim_PlaybackLoop(s_Model* model, s_AnmHeader* anmHdr, GsCOORDINATE2* boneC
  * @note Used as the entry transition for almost every new animation status.
  *
  * @param model Character model to animate.
- * @param anmHdr Active animation header.
+ * @param anmHdr Character animation data.
  * @param boneCoords Character model bone coords.
  * @param animInfo Character animation info.
  */
@@ -1310,7 +1345,7 @@ void Anim_BlendLinear(s_Model* model, s_AnmHeader* anmHdr, GsCOORDINATE2* boneCo
  * @unused?
  *
  * @param model Character model to animate.
- * @param anmHdr Active animation header.
+ * @param anmHdr Character animation data.
  * @param boneCoords Character model bone coords.
  * @param animInfo Character animation info.
  */
@@ -1353,7 +1388,7 @@ void func_800453E8(s_Skeleton* skel, bool cond);
 /** Does something with skeleton bones. `arg0` is a struct pointer. */
 void func_80045468(s_Skeleton* skel, s32* arg1, bool cond);
 
-void func_80045534(s_Skeleton* skel, GsOT* ot, s32 arg2, GsCOORDINATE2* boneCoords, q3_12 arg4, u16 arg5, s_FsImageDesc* images);
+void func_80045534(s_Skeleton* skel, GsOT* ot, s32 otShift, GsCOORDINATE2* boneCoords, q3_12 arg4, u16 clutY, s_FsImageDesc* images);
 
 /** `arg0` is probably a bit flag. */
 void func_8004C564(u8 arg0, s8 weaponAttack);
@@ -1377,12 +1412,13 @@ void func_80054A04(u8 arg0);
 
 bool Gfx_PickupItemAnimate(u8 itemId);
 
-/** @brief Calculates the ammo needed to reload the equipped gun.
- * @param `currentAmmo` pointer to the variable holding the current amount of loaded ammunition of the equipped weapon.
- * @param `availableAmmo` pointer to the variable holding the current amount of available ammunition for the equipped weapon.
- * @param `gunIdx` Index of the gun being reloaded. `e_EquippedWeaponId`.
+/** @brief Computes the ammo needed to reload the equipped gun.
+ *
+ * @param currentAmmo Current amount of loaded ammunition.
+ * @param availableAmmo Ammount of available ammunition.
+ * @param gunIdx Index of the gun being reloaded ()`e_EquippedWeaponId`).
  */
-void Items_AmmoReloadCalculation(s32* currentAmmo, s32* availableAmmo, u8 gunIdx); // 0x80054FC0
+void Items_AmmoReloadCompute(s32* currentAmmo, s32* availableAmmo, u8 gunIdx); // 0x80054FC0
 
 void WorldEnv_Init(void);
 
@@ -1418,7 +1454,7 @@ s32 WorldEnv_LightDirectionAndIntensityGet(SVECTOR* dir);
 
 /** Light function. */
 void Gfx_FlashlightPositionUpdate(q19_12 lightIntensity, q3_12 lensFlareIntensity, GsCOORDINATE2* coord0, GsCOORDINATE2* coord1,
-                   SVECTOR* rot, q19_12 posX, q19_12 posY, q19_12 posZ, s_WaterZone* waterZones);
+                                  SVECTOR* rot, q19_12 posX, q19_12 posY, q19_12 posZ, s_WaterZone* waterZones);
 
 /** Light function. */
 void func_80055648(s32 lightIntensity, const SVECTOR* dir);
@@ -1460,11 +1496,11 @@ void Lm_TransparentPrimSet(s_LmHeader* lmHdr, bool isTransparent);
 s32 Lm_MaterialCountGet(bool (*filterFunc)(s_Material* mat), s_LmHeader* lmHdr);
 
 /** TODO: Unknown `arg3` type. */
-void func_80059D50(s32 arg0, s_ModelInfo* modelInfo, MATRIX* viewMat, bool arg3, GsOT_TAG* tag);
+void func_80059D50(s32 arg0, s_ModelInfo* modelInfo, MATRIX* viewMat, s32 otShift, GsOT_TAG* tag);
 
-void func_80059E34(u32 arg0, s_MeshHeader* meshHdr, s_GteScratchData* scratchData, s32 arg3, GsOT_TAG* tag);
+void func_80059E34(u32 arg0, s_MeshHeader* meshHdr, s_GteScratchData* scratchData, s32 otShift, GsOT_TAG* tag);
 
-void func_8005A21C(s_ModelInfo* modelInfo, GsOT_TAG* otTag, bool arg2, MATRIX* viewMat);
+void func_8005A21C(s_ModelInfo* modelInfo, GsOT_TAG* otTag, s32 otShift, MATRIX* viewMat);
 
 /** @brief Computes a fog-shaded version of `D_800C4190` color using `arg1` as the distance factor?
  *  Stores the result at 0x3D8 into `arg0`.
@@ -1473,14 +1509,14 @@ void func_8005A42C(s_GteScratchData* scratchData, q19_12 alpha);
 
 void func_8005A478(s_GteScratchData* scratchData, q19_12 alpha);
 
-/** `scratchData` is unused? */
-void func_8005A838(s_GteScratchData* scratchData, s32 scale);
+/** `scratchData` is unused. */
+void func_8005A838(s_GteScratchData* scratchData, q19_12 scale);
 
 void func_8005A900(s_MeshHeader* meshHdr, s32 offset, s_GteScratchData* scratchData, MATRIX* viewMat);
 
 u8 func_8005AA08(s_MeshHeader* meshHdr, s32 arg1, s_GteScratchData2* scratchData);
 
-void func_8005AC50(s_MeshHeader* meshHdr, s_GteScratchData2* scratchData, GsOT_TAG* ot, bool arg3);
+void func_8005AC50(s_MeshHeader* meshHdr, s_GteScratchData2* scratchData, GsOT_TAG* ot, bool otShift);
 
 void Texture_Init(s_Texture* tex, char* texName, u8 tPage0, u8 tPage1, s32 u, s32 v, s16 clutX, s16 clutY);
 
@@ -1532,13 +1568,13 @@ void StringCopy(char* prevStr, char* newStr);
 void Gfx_FogOverlayQuadDraw(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4, s32 arg5, GsOT* ot, s32 arg7);
 
 /** Crucial 3D drawing function. */
-void func_80057090(s_ModelInfo* modelInfo, GsOT* otTag, s32 arg2, MATRIX* viewMat, MATRIX* worldMat, u16 arg5);
+void func_80057090(s_ModelInfo* modelInfo, GsOT* otTag, s32 otShift, MATRIX* viewMat, MATRIX* worldMat, u16 clutY);
 
 s32 func_800571D0(u32 arg0);
 
 void WorldEnv_LightTransform(MATRIX* worldMat, q19_12 alpha, SVECTOR* arg2, VECTOR3* arg3);
 
-void func_80057344(s_ModelInfo* modelInfo, GsOT_TAG* otTag, bool arg2, MATRIX* mat);
+void func_80057344(s_ModelInfo* modelInfo, GsOT_TAG* otTag, s32 otShift, MATRIX* mat);
 
 void func_800574D4(s_MeshHeader* meshHdr, s_GteScratchData* scratchData);
 
@@ -1551,7 +1587,7 @@ void func_80057A3C(s_MeshHeader* meshHdr, s32 offset, s_GteScratchData* scratchD
 void func_80057B7C(s_MeshHeader* meshHdr, s32 offset, s_GteScratchData* scratchData, MATRIX* mat);
 
 /** Main quad drawing func? */
-void Gfx_MeshDraw(s_MeshHeader* meshHdr, s_GteScratchData* scratchData, GsOT_TAG* tag, bool arg3);
+void Gfx_MeshDraw(s_MeshHeader* meshHdr, s_GteScratchData* scratchData, GsOT_TAG* tag, s32 arg3);
 
 /** `arg4` unused. */
 s_Texture* Texture_Get(s_Material* mat, s_ActiveChunkTextures* activeTexs, void* fsBuf9, e_FsFile fileIdx, s32 arg4);
@@ -1559,7 +1595,7 @@ s_Texture* Texture_Get(s_Material* mat, s_ActiveChunkTextures* activeTexs, void*
 /** Initializes values in `D_800AE204` array. */
 void func_8005B55C(GsCOORDINATE2* viewCoord);
 
-void Gfx_BillboardDraw(s32 idx, q19_12 posX, q19_12 posY, q19_12 posZ, GsOT* ot_arg4, s32 arg5);
+void Gfx_BillboardDraw(s32 idx, q19_12 posX, q19_12 posY, q19_12 posZ, GsOT* ot_arg4, s32 otShift);
 
 u32 func_8005C478(s16* arg0, q19_12 x0, q19_12 y0, q19_12 x1, q19_12 y1, q19_12 x2, q19_12 y2);
 
@@ -1639,11 +1675,13 @@ s32 func_80036498(void);
 // Used in some RoomBgmInit funcs.
 u32 func_800364BC(void);
 
-void Gfx_CursorDraw(s32 x0, s16 y0, s32 x1, s16 y1, s16 arg4, s16 arg5, s16 arg6, s32 arg7, s32 arg8, u32 arg9, s16 argA, s32 argB);
+void Gfx_CursorDraw(s32 x0, s16 y0, s32 x1, s16 y1, s16 u, s16 v, s16 width, s32 height, s32 tint,
+                    u32 clutX, s16 clutY, s32 tPage);
 
 /** Might retrun `bool`. */
 void func_80089090(s32 arg0);
 
+// Related to libkpad.
 void func_800890B8(void);
 
 s32 func_80089128(void);
@@ -1693,6 +1731,7 @@ void func_800899BC(s_SysWork_2514* arg0, s32 arg1);
 
 bool func_80089D0C(s_SysWork_2514* arg0, s_func_8009ECCC* arg1, s_8002AC04* arg2, u32* arg3);
 
+// Q12 square root?
 u32 func_8008A058(s32 arg0);
 
 /** @brief @unused Returns 0. */
@@ -2002,7 +2041,7 @@ void WorldGfx_IpdSamplePointReset(void);
  */
 void WorldGfx_CloseRangeChunksInit(void);
 
-/** @brief Clears the array containing world objects to draw by resetting its size variable.
+/** @brief Resets the collection of world objects to draw.
  *
  * @param worldGfx World GFX workspace.
  */
@@ -2014,9 +2053,7 @@ void WorldObjects_Clear(s_WorldGfxWork* worldGfxWork);
  */
 void WorldObjects_DrawAllObjects(s_WorldGfxWork* worldGfxWork);
 
-/** @brief Initialize draw for a world object.
- * Get values correspondent to perspective and then passes those values
- * to `WorldObjects_DrawStep`.
+/** @brief Draws a world object, taking into account its position relative to the camera.
  *
  * @param obj World object.
  */
@@ -2061,34 +2098,70 @@ void WorldGfx_CharaModelProcessAllLoads(void);
 
 void WorldGfx_CharaModelProcessLoad(s_CharaModel* model);
 
-void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 arg2, q3_12 timer, s32 arg4);
+void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 otShift, q3_12 timer, s32 paletteIdx);
 
-/** Something for Harry. `arg` is a packed value. */
-void func_8003DE60(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Harry character.
+ *
+ * @param skel Harry model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_HarryMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Cybil. */
-void func_8003DF84(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Cybil character.
+ *
+ * @param skel Cybil model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_CybilMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Monster Cybil. */
-void func_8003E08C(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Monster Cybil character.
+ *
+ * @param skel Monster Cybil model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_MonsterCybilMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Dahlia. */
-void func_8003E194(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Dahlia character.
+ *
+ * @param skel Dahlia model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_DahliaMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Kaufmann. */
-void func_8003E238(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Kaufmann character.
+ *
+ * @param skel Kaufmann model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_KaufmannMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Stalker. */
-void func_8003E388(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Stalker character.
+ *
+ * @param skel Stalker model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_StalkerMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Split Head. */
-void func_8003E414(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Split Head character.
+ *
+ * @param skel Split Head model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_SplitHeadMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Puppet Nurse. */
-void func_8003E4A0(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Puppet Nurse character.
+ *
+ * @param skel Puppet Nurse model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_PuppetNurseMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
-/** Something for Puppet Doctor. */
-void func_8003E544(s_Skeleton* skel, s32 modelBone);
+/** @brief Handles a mesh swap for a Puppet Doctor character.
+ *
+ * @param skel Puppet Doctor model skeleton.
+ * @param meshSwapStatus Packed mesh swap status. See `MESH_SWAP_STATUS`.
+ */
+void WorldGfx_PuppetDoctorMeshSwap(s_Skeleton* skel, s32 meshSwapStatus);
 
 void func_8003ECBC(void);
 
@@ -2208,17 +2281,19 @@ q19_12 func_80080478(const VECTOR3* from, const VECTOR3* to);
  */
 q19_12 Rng_RandQ12(void);
 
-s32 func_80080540(s32 arg0, s32 arg1, s32 arg2);
+// Math with XYZ values.
+s32 func_80080540(q19_12 x, q19_12 y, q19_12 z);
 
 /** Computes (abs(value) - subtractor) * copysign(value). */
 s32 Math_PreservedSignSubtract(s32 val, s32 subtractor);
 
 void func_800805BC(VECTOR3* pos, SVECTOR* rot, GsCOORDINATE2* rootCoord, s32 arg3);
 
-bool func_800806AC(s32 arg0, s32 arg1, s32 arg2, s32 arg3); // arg3 type assumed.
+/** Called by `func_8008074C` which is @unused. */
+bool func_800806AC(s32 arg0, q19_12 posX, q19_12 posY, q19_12 posZ);
 
-/** Probably returns `bool`. */
-bool func_8008074C(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+/** @unused */
+bool func_8008074C(s32 arg0, q19_12 posX, q19_12 posY, q19_12 posZ);
 
 /** Fills `g_CollisionPointCache` with collision data at a given 2D position.
  *
@@ -2243,8 +2318,21 @@ s32 Math_MagnitudeShiftGet(q19_12 mag);
 
 u32 func_8008A2E0(s32 arg0);
 
-/* Does the map zoom in, red lines? Argument types guessed based on f`unc_800E83C0` in MAP2_S00. */
-void Map_BoxOutlineDraw(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8);
+/** @brief Draws a set of expanding boxes used to highlight a point on a paper map.
+ *
+ * @param progressAlpha Progress weight.
+ * @param startX X start corner (top-left).
+ * @param startY Y start corner (top-left).
+ * @param startWidth Start width.
+ * @param startHeight Start height.
+ * @param endX X end corner (bottom-right).
+ * @param endY Y end corner (bottom-right).
+ * @param endWidth End width.
+ * @param endHeight End height.
+ */
+void PaperMap_ExpandingBoxesDraw(q3_12 progressAlpha,
+                                 q3_12 startX, q3_12 startY, q3_12 startWidth, q3_12 startHeight,
+                                 q3_12 endX, q3_12 endY, q3_12 endWidth, q3_12 endHeight);
 
 // TODO: Move these to new headers.
 

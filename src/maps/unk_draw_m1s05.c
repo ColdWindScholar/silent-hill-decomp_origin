@@ -8,7 +8,7 @@
 #include "maps/shared.h"
 
 // Unknown drawing code included in M1S05 and M1S06
-// Splithead enemy code seems to call into this, maybe related to drawing it?
+// Split Head enemy code seems to call into this, maybe related to drawing it?
 // TODO: Make this separate split in each map instead of `#include`.
 
 void sharedFunc_800CBE7C_1_s05(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
@@ -77,8 +77,8 @@ bool sharedFunc_800CBF74_1_s05(POLY_FT4** poly, s32 idx)
         Sfx_WithFlagsPlay(Sfx_Unk1476, &sfxPos, Q8(0.5f), SfxFlag_None);
     }
 
-    gte_SetRotMatrix(&ptr->field_0.field_C);
-    gte_SetTransMatrix(&ptr->field_0.field_C);
+    gte_SetRotMatrix(&ptr->field_0.worldToScreenMat);
+    gte_SetTransMatrix(&ptr->field_0.worldToScreenMat);
 
     if (ABS(g_SysWork.playerWork.player.position.vx - sharedData_800DFB7C_0_s00[idx].field_0.vx_0) +
         ABS(g_SysWork.playerWork.player.position.vz - sharedData_800DFB7C_0_s00[idx].field_4.vz_4) >

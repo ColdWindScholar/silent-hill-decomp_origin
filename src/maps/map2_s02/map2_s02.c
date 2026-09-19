@@ -83,7 +83,7 @@ void func_800E9EAC(void) // 0x800E9EAC
         case 0:
             Player_ControlFreeze();
 
-            g_Screen_FadeStatus = 12; // TODO: Can't be created with `ScreenFade_Start` macro?
+            g_ScreenFade_Status = 12; // TODO: Can't be created with `ScreenFade_Start` macro?
 
             Sd_SfxStop(Sfx_Unk1522);
             SysWork_StateStepIncrement(0);
@@ -146,15 +146,15 @@ void Map_WorldObjectsInit(void) // 0x800EA0E0
 
     if (g_SavegamePtr->gameDifficulty == GameDifficulty_Easy)
     {
-        g_SysWork.npcFlagsId = 2;
+        g_SysWork.npcFlagId = 2;
     }
     else if (g_SavegamePtr->gameDifficulty == GameDifficulty_Normal)
     {
-        g_SysWork.npcFlagsId = 3;
+        g_SysWork.npcFlagId = 3;
     }
     else
     {
-        g_SysWork.npcFlagsId = 4;
+        g_SysWork.npcFlagId = 4;
     }
 
     WorldObject_ModelNameSet(&g_CommonWorldObjects[0], g_CommonWorldObjectNames[2]);
@@ -176,7 +176,7 @@ void Map_WorldObjectsUpdate(void) // 0x800EA1C4
         if (Savegame_EventFlagGet(EventFlag_346))
         {
             Collision_FlagBitsSet(CollisionTriggerFlag_2);
-            Collision_FlagBitsClear(CollisionTriggerFlag_1);
+            Collision_FlagBitsClear(CollisionTriggerFlag_Objects);
 
             if (g_SysWork.playerWork.player.position.vz < Q12(-68.0f))
             {
@@ -186,7 +186,7 @@ void Map_WorldObjectsUpdate(void) // 0x800EA1C4
         else
         {
             Collision_FlagBitsClear(CollisionTriggerFlag_2);
-            Collision_FlagBitsSet(CollisionTriggerFlag_1);
+            Collision_FlagBitsSet(CollisionTriggerFlag_Objects);
         }
     }
 

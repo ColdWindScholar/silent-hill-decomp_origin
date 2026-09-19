@@ -110,7 +110,7 @@ void Kaufmann_ControlUpdate(s_SubCharacter* kaufmann, GsCOORDINATE2* boneCoords)
                 }
             }
 
-            Model_AnimStatusSet(&kaufmann->model, 1, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_1, false);
             Chara_AnimStateReset(kaufmann);
             break;
 
@@ -129,34 +129,34 @@ void Kaufmann_ControlUpdate(s_SubCharacter* kaufmann, GsCOORDINATE2* boneCoords)
                 kaufmannProps.moveSpeed  = CLAMP(kaufmannProps.moveSpeed, 0, Q12(1.25f));
             }
 
-            Model_AnimStatusSet(&kaufmann->model, 3, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_3, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S03)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(4, 3));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_3, KaufmannVariantMesh_4));
 #endif
             break;
 
         case KaufmannControl_5:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 1, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_1, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 0));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_None, KaufmannVariantMesh_1));
             break;
 
         case KaufmannControl_24:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 20, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_20, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S03)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(4, 3));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_3, KaufmannVariantMesh_4));
 #else
-            WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(1, 3));
+            WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 1));
 #endif
             break;
 
         case KaufmannControl_6:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 4, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_4, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP3_S00)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(3, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_3));
 #endif
             break;
 
@@ -167,162 +167,162 @@ void Kaufmann_ControlUpdate(s_SubCharacter* kaufmann, GsCOORDINATE2* boneCoords)
                 func_8006342C(EquippedWeaponId_Unk70, Q12_ANGLE(0.0f), Q12_ANGLE(0.0f), &g_SysWork.npcBoneCoordBuffer[0]);
             }
 
-            Model_AnimStatusSet(&kaufmann->model, 5, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_5, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP3_S00)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(3, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_3));
 #endif
             break;
 
         case KaufmannControl_8:
-            Model_AnimStatusSet(&kaufmann->model, 6, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_6, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP3_S00)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(3, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_3));
 #endif
             break;
 
         case KaufmannControl_9:
-            Model_AnimStatusSet(&kaufmann->model, 7, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_7, false);
             Chara_AnimStateReset(kaufmann);
 
             if (kaufmann->model.anim.keyframeIdx < 139 || !ANIM_STATUS_IS_ACTIVE(kaufmann->model.anim.status))
             {
-                WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 1));
+                WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_1));
             }
             else
             {
                 Savegame_EventFlagSet(EventFlag_198);
-                WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 3));
+                WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_3, KaufmannVariantMesh_1));
             }
             break;
 
         case KaufmannControl_10:
-            Model_AnimStatusSet(&kaufmann->model, 8, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_8, false);
             Chara_AnimStateReset(kaufmann);
             break;
 
         case KaufmannControl_11:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 9, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_9, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S02)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_1));
 #endif
             break;
 
         case KaufmannControl_12:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 22, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_22, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S02)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_1));
 #endif
             break;
 
         case KaufmannControl_13:
-            Model_AnimStatusSet(&kaufmann->model, 10, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_10, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S02)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_1));
 #endif
             break;
 
         case KaufmannControl_14:
-            Model_AnimStatusSet(&kaufmann->model, 11, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_11, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S02)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_1));
 #endif
             break;
 
         case KaufmannControl_15:
-            Model_AnimStatusSet(&kaufmann->model, 12, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_12, false);
             Chara_AnimStateReset(kaufmann);
 
             if (kaufmann->model.anim.keyframeIdx >= 364 && ANIM_STATUS_IS_ACTIVE(kaufmann->model.anim.status))
             {
-                WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(4, 0));
+                WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_None, KaufmannVariantMesh_4));
             }
             break;
 
         case KaufmannControl_16:
-            Model_AnimStatusSet(&kaufmann->model, 2, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_2, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP5_S03)
-            WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(1, 3));
+            WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_3, KaufmannVariantMesh_1));
 #endif
             break;
 
         case KaufmannControl_25:
-            Model_AnimStatusSet(&kaufmann->model, 21, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_21, false);
             Chara_AnimStateReset(kaufmann);
-            WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(3, 3));
+            WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 3));
             break;
 
         case KaufmannControl_17:
-            Model_AnimStatusSet(&kaufmann->model, 13, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_13, false);
             Chara_AnimStateReset(kaufmann);
             break;
 
         case KaufmannControl_18:
-            Model_AnimStatusSet(&kaufmann->model, 16, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_16, false);
             Chara_AnimStateReset(kaufmann);
 
 #if defined(MAP7_S03)
             // TODO: Invert like case 15? can't find how to match.
             if (kaufmann->model.anim.keyframeIdx < 78 || !ANIM_STATUS_IS_ACTIVE(kaufmann->model.anim.status))
             {
-                WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(1, 3));
+                WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 1));
             }
             else
             {
-                WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(4, 3));
+                WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 4));
             }
 #endif
             break;
 
         case KaufmannControl_19:
-            Model_AnimStatusSet(&kaufmann->model, 17, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_17, false);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP7_S03)
-            WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(4, 3));
+            WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 4));
 #endif
             break;
 
         case KaufmannControl_20:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 18, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_18, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 
 #if defined(MAP7_S03)
             if (kaufmann->model.anim.keyframeIdx < 141)
             {
-                WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(4, 3));
+                WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 4));
             }
             else
             {
-                WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(1, 3));
+                WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 1));
             }
 #endif
             break;
 
         case KaufmannControl_21:
-            Model_AnimStatusSet(&kaufmann->model, 15, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_15, false);
             Chara_AnimStateReset(kaufmann);
 
 #if defined(MAP7_S03)
-            WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(1, 1));
+            WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(1, 1));
 #endif
             break;
 
         case KaufmannControl_22:
-            Model_AnimStatusKeyframeSet(kaufmann->model, 19, true, KAUFMANN_ANIM_INFOS, 0);
+            Model_AnimStatusKeyframeSet(kaufmann->model, KaufmannAnim_19, true, KAUFMANN_ANIM_INFOS, 0);
             Chara_AnimStateReset(kaufmann);
 #if defined(MAP7_S03)
-            WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(1, 3));
+            WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(3, 1));
 #endif
             break;
 
         case KaufmannControl_23:
-            Model_AnimStatusSet(&kaufmann->model, 14, false);
+            Model_AnimStatusSet(&kaufmann->model, KaufmannAnim_14, false);
             Chara_AnimStateReset(kaufmann);
             break;
     }
@@ -333,74 +333,74 @@ void Kaufmann_ControlUpdate(s_SubCharacter* kaufmann, GsCOORDINATE2* boneCoords)
     switch (kaufmannProps.controlState)
     {
         case KaufmannControl_1:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_3, true), kaufmann, 53, 41, sfx, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_3, true), kaufmann, 53, 41, sfx, pitch0);
             break;
 
         case KaufmannControl_6:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_4, true), kaufmann, 80, 0, sfx, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_4, true), kaufmann, 80, 0, sfx, pitch0);
             break;
 
         case KaufmannControl_7:
-            sharedFunc_800D9188_0_s00(kaufmann->model.anim.status, kaufmann, 95, Sfx_Unk1492);
+            Npc_SfxPlay(kaufmann->model.anim.status, kaufmann, 95, Sfx_Unk1492);
             break;
 
         case KaufmannControl_9:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_7, true), kaufmann, 132, 174, sfx, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_7, true), kaufmann, 132, 174, sfx, pitch0);
             break;
 
         case KaufmannControl_10:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_8, true), kaufmann, 191, 0, sfx, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_8, true), kaufmann, 191, 0, sfx, pitch0);
             break;
 
         case KaufmannControl_17:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_13, true), kaufmann, 393, 0, sfx, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_13, true), kaufmann, 393, 0, sfx, pitch0);
             break;
 
         case KaufmannControl_13:
-            sharedFunc_800D9188_0_s00(ANIM_STATUS(KaufmannAnim_10, true), kaufmann, 307, Sfx_Unk1594);
+            Npc_SfxPlay(ANIM_STATUS(KaufmannAnim_10, true), kaufmann, 307, Sfx_Unk1594);
             break;
 
         case KaufmannControl_15:
             if (kaufmann->model.anim.keyframeIdx <= 353)
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_12, true), kaufmann, 357, 353, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_12, true), kaufmann, 357, 353, sfx, pitch0);
             }
             else
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_12, true), kaufmann, 357, 361, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_12, true), kaufmann, 357, 361, sfx, pitch0);
             }
             break;
 
         case KaufmannControl_16:
             if (kaufmann->model.anim.keyframeIdx <= 21)
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_2, true), kaufmann, 28, 21, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_2, true), kaufmann, 28, 21, sfx, pitch0);
             }
             else
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_2, true), kaufmann, 28, 34, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_2, true), kaufmann, 28, 34, sfx, pitch0);
             }
             break;
 
         case KaufmannControl_25:
             if (kaufmann->model.anim.keyframeIdx <= 247)
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_21, true), kaufmann, 254, 247, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_21, true), kaufmann, 254, 247, sfx, pitch0);
             }
             else
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_21, true), kaufmann, 254, 260, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_21, true), kaufmann, 254, 260, sfx, pitch0);
             }
             break;
 
         case KaufmannControl_22:
             if (kaufmann->model.anim.keyframeIdx <= 211)
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_19, true), kaufmann, 217, 211, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_19, true), kaufmann, 217, 211, sfx, pitch0);
             }
             else
             {
-                sharedFunc_800D908C_0_s00(ANIM_STATUS(KaufmannAnim_19, true), kaufmann, 217, 221, sfx, pitch0);
+                Npc_FootstepSoundPlay(ANIM_STATUS(KaufmannAnim_19, true), kaufmann, 217, 221, sfx, pitch0);
             }
             break;
     }
@@ -430,9 +430,9 @@ void Kaufmann_Init(s_SubCharacter* kaufmann)
     sharedData_800D5CF4_3_s00 = 0;
 
 #ifdef MAP7_S03
-    WorldGfx_HeldItemAttach(Chara_EndingKaufmann, MODEL_BONE(0, 1)); // TODO: MAP7_S03 `Kaufmann` funcs could be `EndingKaufmann` instead, if other `Kaufmann` funcs don't match other overlays.
+    WorldGfx_CharaMeshSwap(Chara_EndingKaufmann, MESH_SWAP_STATUS(1, 0)); // TODO: MAP7_S03 `Kaufmann` funcs could be `EndingKaufmann` instead, if other `Kaufmann` funcs don't match other overlays.
 #else
-    WorldGfx_HeldItemAttach(Chara_Kaufmann, MODEL_BONE(0, 1));
+    WorldGfx_CharaMeshSwap(Chara_Kaufmann, MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_None));
 #endif
 
 #ifdef MAP7_S02

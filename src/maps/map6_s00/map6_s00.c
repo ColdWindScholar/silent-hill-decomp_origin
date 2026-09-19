@@ -147,7 +147,7 @@ void func_800EB11C(void) // 0x800EB11C
             Dms_HeaderFixOffsets(FS_BUFFER_15);
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
 
             D_800F0684 = 0;
             D_800F0044 = 0;
@@ -156,7 +156,7 @@ void func_800EB11C(void) // 0x800EB11C
             Event_CharaAnimCmdExecute(CharaAnimCmd_SetState, &g_SysWork.playerWork.player, 53, false);
             Game_TurnFlashlightOn();
 
-            sharedFunc_800D08B8_0_s00(2, 127);
+            Particle_EnvironmentSet(2, 127);
             Particle_SystemUpdate(0, g_SavegamePtr->mapIdx, 0);
             sharedFunc_800D0B18_0_s00(6);
 
@@ -208,7 +208,7 @@ void func_800EB11C(void) // 0x800EB11C
         case 10:
             Event_CharaAnimCmdExecute(CharaAnimCmd_SetState, &g_SysWork.playerWork.player, 114, false);
             Savegame_EventFlagSet(EventFlag_402);
-            sharedFunc_800D08B8_0_s00(6, 127);
+            Particle_EnvironmentSet(6, 127);
             Particle_SystemUpdate(0, g_SavegamePtr->mapIdx, 0);
             Savegame_EventFlagSet(EventFlag_414);
             D_800F0044 = Q12(3.4f);
@@ -272,10 +272,10 @@ void func_800EB11C(void) // 0x800EB11C
 
             SD_Call(19);
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             Sd_SfxStop(Sfx_Unk1522);
             Sd_SfxStop(Sfx_Unk1599);
-            sharedFunc_800D08B8_0_s00(6, 127);
+            Particle_EnvironmentSet(6, 127);
             Particle_SystemUpdate(0, g_SavegamePtr->mapIdx, 0);
             break;
     }
@@ -366,15 +366,15 @@ void Map_WorldObjectsInit(void) // 0x800EBCE8
     switch (g_SavegamePtr->gameDifficulty)
     {
         case GameDifficulty_Normal:
-            g_SysWork.npcFlagsId = 4;
+            g_SysWork.npcFlagId = 4;
             break;
 
         case GameDifficulty_Easy:
-            g_SysWork.npcFlagsId = 3;
+            g_SysWork.npcFlagId = 3;
             break;
 
         default:
-            g_SysWork.npcFlagsId = 5;
+            g_SysWork.npcFlagId = 5;
             break;
     }
 
@@ -409,7 +409,7 @@ void Map_WorldObjectsUpdate(void) // 0x800EBEE0
     {
         if (!Savegame_EventFlagGet(EventFlag_402))
         {
-            collFlags |= CollisionTriggerFlag_1;
+            collFlags |= CollisionTriggerFlag_Objects;
         }
 
         Text_Debug_PositionSet(30, 30);
@@ -432,7 +432,7 @@ void Map_WorldObjectsUpdate(void) // 0x800EBEE0
                 WorldObjects_Add(&g_WorldObject_DrOpen1.object, &g_WorldObject_DrOpen1.position, &SVECTOR3_Zero);
                 WorldObjects_Add(&g_WorldObject_DrOpen2.object, &g_WorldObject_DrOpen2.position, &SVECTOR3_Zero);
 
-                collFlags |= CollisionTriggerFlag_1;
+                collFlags |= CollisionTriggerFlag_Objects;
             }
             else
             {

@@ -36,6 +36,7 @@
 // STATIC VARIABLES
 // ========================================
 
+/** @brief Game system state functions. Used with `e_SysState`. */
 static void (*g_SysStateFuncs[])(void) = {
     SysState_Gameplay_Update,
     SysState_OptionsMenu_Update,
@@ -57,18 +58,18 @@ static void (*g_SysStateFuncs[])(void) = {
 /** Used to store the previous delta time state of the delta timer. There are some instances where 2D backgrounds
  * are drawn using `g_DeltaTimeRaw` while `g_DeltaTime` is stopped.
  */
-static s32 g_DeltaTimeCpy;
+static q19_12 g_DeltaTimeCpy;
 
 // ========================================
 // GLOBAL VARIABLES
 // ========================================
 
-s_EventData*   g_ItemTriggerEvents[];
-s_RadioNpcInfo g_RadioNpcInfos[2];
-s_MapPoint2d   D_800BCDB0;
-s32            g_ItemTriggerItemIds[5];
-u8             D_800BCDD4;
-s_EventData*   g_MapEventData;
+s_EventData* g_ItemTriggerEvents[];
+s_RadioNoise g_RadioNoise[2];
+s_MapPoint2d g_MapPoint;
+s32          g_ItemTriggerItemIds[5];
+u8           g_MapAreaLoadCounter;
+s_EventData* g_MapEventData;
 
 void GameState_InGame_Update(void) // 0x80038BD4
 {
@@ -85,7 +86,7 @@ void GameState_InGame_Update(void) // 0x80038BD4
 
         case 1:
             DrawSync(SyncMode_Wait);
-            func_80037154();
+            Game_RadioNoiseReset();
             Game_MapRoomIdxUpdate();
             func_800892A4(1);
 
@@ -109,6 +110,7 @@ void GameState_InGame_Update(void) // 0x80038BD4
         g_DeltaTimeCpy = g_DeltaTimeRaw;
     }
 
+    // Run system state.
     if (g_SysWork.sysState == SysState_Gameplay)
     {
         g_SysWork.isMgsStringSet = false;
@@ -131,9 +133,11 @@ void GameState_InGame_Update(void) // 0x80038BD4
     }
     Demo_DemoRandSeedRestore();
 
-    D_800A9A0C = ScreenFade_IsFinished() && Fs_QueueChunksLoad();
+    g_IsLoadingFinished = ScreenFade_IsFinished() && Fs_QueueChunksLoad();
 
-    if (!(g_SysWork.bgmStatusFlags & BgmStatusFlag_Pause) && g_MapOverlayHdr.updateWorldObjects != NULL)
+    // Update world objects if not paused.
+    if (!(g_SysWork.bgmStatusFlags & BgmStatusFlag_Pause) &&
+        g_MapOverlayHdr.updateWorldObjects != NULL)
     {
         g_MapOverlayHdr.updateWorldObjects();
     }
@@ -143,6 +147,7 @@ void GameState_InGame_Update(void) // 0x80038BD4
     Demo_DemoRandSeedRestore();
     Demo_DemoRandSeedRestore();
 
+    // Update world scene if not paused.
     if (!(g_SysWork.bgmStatusFlags & BgmStatusFlag_Pause))
     {
         World_NearbyPlayerCollisionTriggersGet();
@@ -163,7 +168,7 @@ void GameState_InGame_Update(void) // 0x80038BD4
 
         if (g_SavegamePtr->mapIdx != MapIdx_MAP7_S03)
         {
-            g_MapOverlayHdr.particlesUpdate(0, g_SavegamePtr->mapIdx, 1);
+            g_MapOverlayHdr.particleSystemUpdate(0, g_SavegamePtr->mapIdx, 1);
         }
 
         Demo_DemoRandSeedRestore();
@@ -181,7 +186,7 @@ void GameState_InGame_Update(void) // 0x80038BD4
         Game_NpcUpdate();
         func_8005E89C();
         WorldGfx_CloseRangeChunksInit();
-        WorldGfx_Draw(true);
+        WorldGfx_Draw(1);
         Demo_DemoRandSeedAdvance();
     }
 }
@@ -229,7 +234,7 @@ void SysState_Gameplay_Update(void) // 0x80038BD4
     }
 
     if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.light &&
-        g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & (1 << 1))
+        g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_FlashlightAllowed)
     {
         Game_FlashlightToggle();
     }
@@ -280,11 +285,11 @@ void SysState_GamePaused_Update(void) // 0x800391E8
     if (!((D_800A9A68 >> 11) & (1 << 0)))
     {
 #if VERSION_REGION_IS(NTSCJ)
-        Gfx_StringSetPosition(SCREEN_POSITION_X(41.0f), SCREEN_POSITION_Y(43.5f));
-        Gfx_StringDraw("\x07PAUSE", DEFAULT_MAP_MESSAGE_LENGTH);
+        Gfx_StringPositionSet(131, 104);
+        Gfx_StringDraw("\7PAUSE", DEFAULT_MAP_MESSAGE_LENGTH);
 #else
-        Gfx_StringSetPosition(SCREEN_POSITION_X(39.25f), SCREEN_POSITION_Y(43.5f));
-        Gfx_StringDraw("\x07PAUSED", DEFAULT_MAP_MESSAGE_LENGTH);
+        Gfx_StringPositionSet(125, 104);
+        Gfx_StringDraw("\7PAUSED", DEFAULT_MAP_MESSAGE_LENGTH);
 #endif
     }
 
@@ -344,7 +349,7 @@ void SysState_OptionsMenu_Update(void) // 0x80039344
             break;
     }
 
-    if (D_800A9A0C != 0)
+    if (g_IsLoadingFinished)
     {
         Game_StateSetNext(GameState_OptionScreen);
     }
@@ -488,9 +493,9 @@ void SysState_MapScreen_Update(void) // 0x800396D4
             SysWork_StateSetNext(SysState_Gameplay);
         }
     }
-    else if ((g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & (1 << 1)) && !g_SysWork.field_2388.isFlashlightOn &&
-             ((g_SysWork.field_2388.field_1C[0].effectsInfo.field_0.s_field_0.field_0 & (1 << 0)) ||
-              (g_SysWork.field_2388.field_1C[1].effectsInfo.field_0.s_field_0.field_0 & (1 << 0))))
+    else if ((g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_FlashlightAllowed) && !g_SysWork.field_2388.isFlashlightOn &&
+             ((g_SysWork.field_2388.field_1C[0].effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment) ||
+              (g_SysWork.field_2388.field_1C[1].effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment)))
     {
         if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.map ||
             Gfx_MapMsg_Draw(MapMsgIdx_TooDarkForMap) > MapMsgState_Idle)
@@ -514,7 +519,7 @@ void SysState_MapScreen_Update(void) // 0x800396D4
             g_SysWork.sysStateSteps[0]++;
         }
 
-        if (D_800A9A0C != 0)
+        if (g_IsLoadingFinished)
         {
             Game_StateSetNext(GameState_PaperMapScreen);
         }
@@ -558,7 +563,7 @@ void SysState_Fmv_Update(void) // 0x80039A58
     {
         case 0:
             ScreenFade_Start(false, false, false);
-            D_800A9A0C                  = 0;
+            g_IsLoadingFinished                 = false;
             g_SysWork.sysStateSteps[0] = 1;
 
         case 1:
@@ -570,7 +575,7 @@ void SysState_Fmv_Update(void) // 0x80039A58
             break;
     }
 
-    if (D_800A9A0C == 0)
+    if (!g_IsLoadingFinished)
     {
         return;
     }
@@ -597,7 +602,7 @@ void SysState_Fmv_Update(void) // 0x80039A58
     // Set savegame flag based on `g_MapEventData->completeEventFlag` flag ID.
     Savegame_EventFlagSetAlt(g_MapEventData->completeEventFlag);
 
-    // Return to game.
+    // Return to gameplay.
     Game_StateSetNext(GameState_InGame);
 
     // If flag is set, returns to `GameState_InGame` with `gameStateSteps[0]` = 1.
@@ -613,7 +618,7 @@ void SysState_LoadArea_Update(void) // 0x80039C40
     s_MapPoint2d* mapPoint;
 
     g_SysWork.unused_229C         = 0;
-    g_SysWork.loadingScreenIdx    = D_800BCDB0.loadingScreenId;
+    g_SysWork.loadingScreenIdx    = g_MapPoint.loadingScreenId;
     g_SysWork.sfxPairIdx          = g_MapEventData->sfxPairIdx_8_19;
     g_SysWork.areaTransitionFlags = g_MapEventData->transitionFlags;
 
@@ -621,17 +626,17 @@ void SysState_LoadArea_Update(void) // 0x80039C40
 
     if (g_SysWork.sfxPairIdx == SfxPairIdx_7)
     {
-        D_800BCDD4          = 0;
-        g_SysWork.sysFlags |= SysFlag_LoadActive;
+        g_MapAreaLoadCounter = 0;
+        g_SysWork.sysFlags  |= SysFlag_LoadActive;
     }
 
-    D_800BCDB0 = g_MapOverlayHdr.mapPoints[g_MapEventData->eventParam];
-    if (D_800BCDB0.triggerParam1 == 1)
+    g_MapPoint = g_MapOverlayHdr.mapPoints[g_MapEventData->eventParam];
+    if (g_MapPoint.triggerParam1 == 1)
     {
         mapPoint              = &g_MapOverlayHdr.mapPoints[g_MapEventData->mapPointIdx];
         offsetZ               = g_SysWork.playerWork.player.position.vz - mapPoint->positionZ;
-        D_800BCDB0.positionX += g_SysWork.playerWork.player.position.vx - mapPoint->positionX;
-        D_800BCDB0.positionZ += offsetZ;
+        g_MapPoint.positionX += g_SysWork.playerWork.player.position.vx - mapPoint->positionX;
+        g_MapPoint.positionZ += offsetZ;
     }
 
     if (g_SysWork.sysState == SysState_LoadOverlay)
@@ -669,7 +674,7 @@ void SysState_LoadArea_Update(void) // 0x80039C40
 
 void AreaLoad_UpdatePlayerPosition(void) // 0x80039F30
 {
-    Chara_PositionSet(&D_800BCDB0);
+    Chara_PositionSet(&g_MapPoint);
 }
 
 void AreaLoad_TransitionSound(void) // 0x80039F54
@@ -694,9 +699,9 @@ void SysState_ReadMessage_Update(void) // 0x80039FB8
 
     // When `SysState_ReadMessage_Update` is called, the game world freezes.
     // The following conditions unfreeze:
-    // - A specific event related flag is disenabled.
-    // - A specific camera related flag is disenabled.
-    // - There is no alive enemy.
+    // - A specific event related flag is disabled.
+    // - A specific camera related flag is disabled.
+    // - All enemies are dead.
     if (!(g_MapEventData->transitionFlags & AreaTransitionFlag_UnfreezeWorld) &&
         !(g_SysWork.sysFlags & SysFlag_5))
     {
@@ -802,7 +807,7 @@ void SysState_SaveMenu_Update(void) // 0x8003A230
             break;
 
         case 1:
-            if (D_800A9A0C != 0)
+            if (g_IsLoadingFinished)
             {
                 ScreenFade_Start(true, true, false);
                 func_8003943C();
@@ -888,8 +893,8 @@ void SysState_GameOver_Update(void) // 0x8003A52C
             {
                 if (!Flags16b_IsSet(seenTipIdxs, tipIdx))
                 {
-                    if ((!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) && (tipIdx - 13) >= 2u) ||
-                        ( (g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) && (tipIdx - 13) <  2u))
+                    if ((!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) && (tipIdx - 13) >= 2u) ||
+                        ( (g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) && (tipIdx - 13) <  2u))
                     {
                         randTipVal += 3;
                     }
@@ -908,8 +913,8 @@ void SysState_GameOver_Update(void) // 0x8003A52C
             {
                 if (!Flags16b_IsSet(seenTipIdxs, tipIdx))
                 {
-                    if ((!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) && (tipIdx - 13) >= 2u) ||
-                        ( (g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3) && (tipIdx - 13) <  2u))
+                    if ((!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) && (tipIdx - 13) >= 2u) ||
+                        ( (g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)) && (tipIdx - 13) <  2u))
                     {
                         if (randTipVal < 3)
                         {
@@ -949,12 +954,12 @@ void SysState_GameOver_Update(void) // 0x8003A52C
             SysWork_StateStepIncrement(0);
 
         case 3:
-            Gfx_StringSetPosition(SCREEN_POSITION_X(32.5f), SCREEN_POSITION_Y(43.5f));
-            Gfx_StringDraw("\aGAME_OVER", DEFAULT_MAP_MESSAGE_LENGTH);
+            Gfx_StringPositionSet(104, 104);
+            Gfx_StringDraw("\7GAME_OVER", DEFAULT_MAP_MESSAGE_LENGTH);
             g_SysWork.sysStateStepData[0]++;
 
             if ((g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                   g_GameWorkPtr->config.controllerConfig.cancel)) ||
+                                                       g_GameWorkPtr->config.controllerConfig.cancel)) ||
                 g_SysWork.sysStateStepData[0] > SECONDS_60_FPS(4))
             {
                 SysWork_StateStepIncrement(0);
@@ -962,8 +967,8 @@ void SysState_GameOver_Update(void) // 0x8003A52C
             break;
 
         case 4:
-            Gfx_StringSetPosition(SCREEN_POSITION_X(32.5f), SCREEN_POSITION_Y(43.5f));
-            Gfx_StringDraw("\aGAME_OVER", DEFAULT_MAP_MESSAGE_LENGTH);
+            Gfx_StringPositionSet(104, 104);
+            Gfx_StringDraw("\7GAME_OVER", DEFAULT_MAP_MESSAGE_LENGTH);
             Event_ScreenFadeCmd(ScreenFadeCmd_Auto, true, 0, Q12(2.0f), false);
             break;
 
@@ -991,7 +996,7 @@ void SysState_GameOver_Update(void) // 0x8003A52C
             Screen_BackgroundImgDraw(&g_DeathTipImg);
 
             if (!(g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                    g_GameWorkPtr->config.controllerConfig.cancel)))
+                                                        g_GameWorkPtr->config.controllerConfig.cancel)))
             {
                 if (g_SysWork.sysStateStepData[0] <= SECONDS_60_FPS(8))
                 {
@@ -1036,7 +1041,7 @@ void GameState_MapEvent_Update(void) // 0x8003AA4C
         g_GameWork.gameStateSteps[0] = 1;
     }
 
-    D_800A9A0C = ScreenFade_IsFinished() && Fs_QueueChunksLoad();
+    g_IsLoadingFinished = ScreenFade_IsFinished() && Fs_QueueChunksLoad();
 
     Savegame_EventFlagSetAlt(g_MapEventData->completeEventFlag);
     g_MapOverlayHdr.mapEventFuncs[g_MapEventParam]();

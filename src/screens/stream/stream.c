@@ -48,7 +48,7 @@ void GameState_MovieIntroFadeIn_Update(void) // 0x801E2654
             break;
     }
 
-    Screen_BackgroundImgDraw(D_800A900C);
+    Screen_BackgroundImgDraw(g_MemCardWarningImg);
 }
 
 void GameState_MovieIntro_Update(void) // 0x801E279C
@@ -98,7 +98,7 @@ void GameState_DebugMoviePlayer_Update(void) // 0x801E2908
         g_Debug_MoviePlayerIdx++;
     }
 
-    Text_Debug_PositionSet(SCREEN_POSITION_X(12.5f), SCREEN_POSITION_Y(16.75f));
+    Text_Debug_PositionSet(SCREEN_WIDTH / 8, 40);
 
 #if VERSION_EQUAL_OR_OLDER(PROTO_981216)
     // Code seen in 98-12-16 to display movie number selection (`Text_Debug_Draw` was nullsub in those builds).
@@ -143,9 +143,9 @@ void open_main(s32 file_idx, s16 num_frames) // 0x801E2AA4
         num_frames = g_FileTable[file_idx].blockCount - 7;
     }
 
-    Screen_RectInterlacedClear(0, 16, 480, 480, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+    Screen_RectInterlacedClear(0, 16, 480, 480, 0, 0, 0);
     movie_main(NULL, num_frames, g_FileTable[file_idx].startSector);
-    Screen_RectInterlacedClear(0, 16, 480, 480, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+    Screen_RectInterlacedClear(0, 16, 480, 480, 0, 0, 0);
     VSync(SyncMode_Wait);
     GsSwapDispBuff();
 }

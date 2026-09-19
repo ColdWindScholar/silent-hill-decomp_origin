@@ -127,7 +127,7 @@ s32 GameState_KcetLogo_MemCardCheck(void) // 0x800C9874
         return KcetLogoStateStep_HasSavegame;
     }
 
-    return KcetLogoStateStep_NoSaveGame;
+    return KcetLogoStateStep_NoSavegame;
 }
 
 void GameState_KcetLogo_Update(void) // 0x800C99A4
@@ -201,7 +201,7 @@ void GameState_KcetLogo_Update(void) // 0x800C99A4
 
                     // Reset drive & sound driver
                     CdReset(1);
-                    sd_work_init();
+                    SD_InitStruct();
 #endif
 
                     while (g_GameWork.gameStateSteps[0] < KcetLogoStateStep_NoMemCard)
@@ -215,9 +215,9 @@ void GameState_KcetLogo_Update(void) // 0x800C99A4
 
             case KcetLogoStateStep_NoMemCard:
 #if VERSION_REGION_IS(NTSCJ)
-                Fs_QueueStartReadTim(FILE_1ST_NO_MEMCD_TIM, FS_BUFFER_1, &D_800A900C);
+                Fs_QueueStartReadTim(FILE_1ST_NO_MEMCD_TIM, FS_BUFFER_1, &g_MemCardWarningImg);
 #else
-                Fs_QueueStartReadTim(FILE_1ST_NO_MCD_E_TIM, FS_BUFFER_1, &D_800A900C);
+                Fs_QueueStartReadTim(FILE_1ST_NO_MCD_E_TIM, FS_BUFFER_1, &g_MemCardWarningImg);
 #endif
                 GameFs_StreamBinLoad();
                 nextGameState = GameState_MovieIntroFadeIn;
@@ -227,9 +227,9 @@ void GameState_KcetLogo_Update(void) // 0x800C99A4
 
             case KcetLogoStateStep_NoMemCardFreeSpace:
 #if VERSION_REGION_IS(NTSCJ)
-                Fs_QueueStartReadTim(FILE_1ST_NO_BLOCK_TIM, FS_BUFFER_1, &D_800A900C);
+                Fs_QueueStartReadTim(FILE_1ST_NO_BLOCK_TIM, FS_BUFFER_1, &g_MemCardWarningImg);
 #else
-                Fs_QueueStartReadTim(FILE_1ST_NO_BLK_E_TIM, FS_BUFFER_1, &D_800A900C);
+                Fs_QueueStartReadTim(FILE_1ST_NO_BLK_E_TIM, FS_BUFFER_1, &g_MemCardWarningImg);
 #endif
                 GameFs_StreamBinLoad();
                 nextGameState = GameState_MovieIntroFadeIn;
@@ -237,7 +237,7 @@ void GameState_KcetLogo_Update(void) // 0x800C99A4
                 Game_StateStepSet(0, KcetLogoStateStep_LogoDelay);
                 break;
 
-            case KcetLogoStateStep_NoSaveGame:
+            case KcetLogoStateStep_NoSavegame:
                 GameFs_StreamBinLoad();
                 GameFs_TitleGfxSeek();
                 nextGameState = GameState_MovieIntro;

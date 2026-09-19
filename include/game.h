@@ -34,14 +34,6 @@
 #define SECONDS_60_FPS(sec) \
     (s32)((sec) * TICKS_PER_SECOND)
 
-/** @brief Converts a floating-point X screen position in percent to a fixed-point X screen coodinate. */
-#define SCREEN_POSITION_X(percent) \
-    (s32)(SCREEN_WIDTH * ((percent) / 100.0f))
-
-/** @brief Converts a floating-point Y screen position in percent to a fixed-point Y screen coodinate. */
-#define SCREEN_POSITION_Y(percent) \
-    (s32)(SCREEN_HEIGHT * ((percent) / 100.0f))
-
 /** @brief Packs a weapon attack containing a weapon ID and attack input type.
  *
  * @param weaponId Weapon ID.
@@ -296,6 +288,23 @@ typedef enum _GameEndingFlags
     GameEndingFlag_7        = 1 << 7  // Set if ranking has been seen and ending was UFO?
 } e_GameEndingFlags;
 
+typedef enum _SpecialEnvEventFlags
+{
+    SpecialEnvEventFlags_None              = 0,
+    SpecialEnvEventFlags_DarkEnvironment   = 1 << 0, // Double check.
+    SpecialEnvEventFlags_FlashlightAllowed = 1 << 1,
+    SpecialEnvEventFlags_EnableBrightness  = 1 << 2,
+    SpecialEnvEventFlags_UseLighter        = 1 << 3,
+    SpecialEnvEventFlags_EnableLensflare   = 1 << 4,
+} e_SpecialEnvEventFlags;
+
+typedef enum _UnkGfxEnum
+{
+    UnkGfxEnum_0 = 0,
+    UnkGfxEnum_1 = 1,
+    UnkGfxEnum_2 = 2,
+} e_UnkGfxEnum;
+
 /** @brief Game workspace. Stores miscellaneous gameplay-related data. */
 typedef struct _GameWork
 {
@@ -315,7 +324,7 @@ typedef struct _GameWork
     /* 0x5B0 */ s8                 __pad_5B0;
     /* 0x5B1 */ s8                 mapAnimIdx;
     /* 0x5B2 */ s8                 bgmIdx;            /** `BgmCmd` | Currently player background music track. */
-    /* 0x5B4 */ s8                 ambientIdx;        /** Index of `g_AmbientVabTaskLoadCmds`. */
+    /* 0x5B4 */ s8                 ambientIdx;        /** Index of `g_AmbientVabTaskLoad`. */
     /* 0x5B4 */ s_AnalogController rawController;
     /* 0x5BC */ s8                 unused_5BC[28];    // @unused Debug data?
 } s_GameWork;
@@ -357,37 +366,63 @@ typedef struct _PlayerCombat
 } s_PlayerCombat;
 STATIC_ASSERT_SIZEOF(s_PlayerCombat, 20);
 
-typedef union
-{
-    /* 0x0 */ s32 field_0; // Flags?
-              struct
-              {
-                  u8 field_0; // Flags. (1 << 0) Might be flashlight enabled.
-                  u8 field_1;
-                  u8 field_2;
-                  s8 __pad_3;
-    /* 0x4 */ } s_field_0;
-} u_Unk0;
-
 /** @brief Map effects info. */
 typedef struct _MapEffectsInfo
 {
-    /* 0x0  */ u_Unk0  field_0;
-    /* 0x4  */ q3_12   field_4; // Alpha.
-    /* 0x6  */ q3_12   field_6; // World tint color intensity.
+    /* 0x0  */ union
+               {
+                   s32 field_0;     // }
+                   u8  field_00[4]; // } Index 0 `e_SpecialEnvEventFlags` | Index 2 `e_UnkGfxEnum`.
+               } flags;
+    /* 0x4  */ q3_12   spotLightIntensity;
+    /* 0x6  */ q3_12   worldLightIntensity;
     /* 0x8  */ q3_12   worldTintR;
     /* 0xA  */ q3_12   worldTintG;
     /* 0xC  */ q3_12   worldTintB;
-    /* 0xE  */ u8      field_E; // Fog enabled if not set to 0, `Gfx_FogParametersSet` checks for values 0/1/2/3.
-                                // Sets the transparent grey layer overlaid on characters and the enviroment.
+    /* 0xE  */ u8      field_E; /** Some fog state information.
+                                 * It works basically as a boolean to determine if fog is or not enabled, however,
+                                 * the code count with probably unused features as some pieces of code handle cases
+                                 * where this variable is set to 2 and 3.
+                                 * * In `Gfx_FogParametersSet` if this variable is set to 3 has the same behaviour of
+                                 * * 0 and 1 (which is setting the targ et fog distance), but if it is set to 2 the fog.
+                                 * * distance is set to 0.
+                                 * * In `Gfx_EffectsUpdate` setting the value to 3 sets some special behaviour and
+                                 * * adjust the fog distance.
+                                 * The only way this value is set is through the defined enviroment preset at `MAP_EFFECTS_INFOS`
+                                 * and by that it can be confirmed that 2 is unused as it is never defined in any preset, 3 only
+                                 * at the sixth (index 5) element defined, but, it seems the code never uses that preset.
+                                 * Forcing the load of the preset that assigns 3 at the beginning of the game result in a dark
+                                 * scene with the flashlight emitting a gigantic light effect, similar to the light that the
+                                 * flauros emits at the scene where Dahlia kidnap Alessa, but more intense and a slight purple
+                                 * world tone.
+                                 *
+                                 * Possibly state 2 and 3 were some early attempt to circumvent some issue with some effect
+                                 * that were left unused.
+                                 */
     /* 0x10 */ q19_12  fogDistance;
     /* 0x14 */ CVECTOR fogColor;
     /* 0x18 */ u8      enableTintLightOverlap; /** `bool` */
     /* 0x19 */ CVECTOR pointLightTint;         /** Volumetric point light color. */
     /* 0x1D */ CVECTOR worldTint;              /** Subtractive. */
-    /* 0x21 */ CVECTOR field_21;               // Particle effect related. Only the first value affects snow transparency.
+    
+                                /** Odd use. (Particle related)
+                                 * This variables are only ever used in the maps' particle system. At `Particle_SystemUpdate`
+                                 * these variables values are retrieved to two different global variables by using  `func_8003EDB8`
+                                 *
+                                 * The values from `field_21` are only used in the code that handles the snow effect to define the color of the particles.
+                                 * The values from `field_26` are used in the code that handles the snow and rain effect from the first
+                                 * overlay, to define the color of the particles.
+                                 *
+                                 * The first variable shouldn't do any real impact as by default the game uses only the red value
+                                 * to represent all of the other three values, despite the existance of code that handle each of the
+                                 * variables from the struct, that code is never used. That code is also exclusive of the first overlay
+                                 * other overlays doesn't have the function that uses this value.
+                                 * The second variable seems to be either broken or doesn't do any real impact neither in rain the
+                                 * effect or the snow effect.
+                                 */
+    /* 0x21 */ CVECTOR field_21;
     /* 0x25 */ CVECTOR field_25;
-               // 3 byte of padding.
+               // 3 bytes of padding.
 } s_MapEffectsInfo;
 STATIC_ASSERT_SIZEOF(s_MapEffectsInfo, 44);
 
@@ -403,21 +438,33 @@ STATIC_ASSERT_SIZEOF(s_StructUnk3, 52);
 // Current enviroment effects information.
 typedef struct
 {
-    /* 0x0   */ s32             primitiveType; /** `e_PrimitiveType` */
-    /* 0x4   */ s8*             field_4;       /** Points to different types of data depending on `field_0`. */
-    /* 0x8   */ s32             field_8;       // } Q19.12?
-    /* 0xC   */ s32             field_C;       // }
-    /* 0x10  */ s32             field_10;
-    /* 0x14  */ u8              field_14;                /** `bool` */
-    /* 0x15  */ u8              isFlashlightOn;          /** `bool` */
-    /* 0x16  */ u8              isFlashlightUnavailable; /** `bool` */
+    /* 0x0   */ s32          primitiveType; /** `e_PrimitiveType` */
+    /* 0x4   */ s8*          field_4;       // } This stores a pointer to some data from overlays.
+    /* 0x8   */ q19_12       field_8;       // } All this values are related to `primitiveType` which seemly does some special work for
+                                            // } some special flashlight/spotlight effect.
+    /* 0xC   */ q19_12       field_C;       // }
+    /* 0x10  */ q19_12       field_10;      /** @unused Dead code. This variable stores a value returned by `func_8003FEC0`
+                                             * (which is the only instance in the code this function is ever used), but it's
+                                             * never used.
+                                             */
+    /* 0x14  */ u8           flashEffect;             /** `bool`. Trigger world flash effect (used for weapons). */
+    /* 0x15  */ u8           isFlashlightOn;          /** `bool` */
+    /* 0x16  */ u8           isFlashlightUnavailable; /** `bool` */
                 // 1 byte of padding.
-    /* 0x18  */ q3_12           flashlightIntensity;
-    /* 0x1A  */ u16             field_1A;
-    /* 0x1C  */ s_StructUnk3    field_1C[2];
-    /* 0x84  */ s_StructUnk3    field_84[2];
-    /* 0xEC  */ s_StructUnk3    field_EC[2];
-    /* 0x154 */ s_StructUnk3    field_154;
+    /* 0x18  */ q3_12        flashlightIntensity;
+                // 2 bytes of padding.
+                
+                /** Each of these arrays represent some sort of graphical configuration for the
+                 * in-game state. The reason of two is because one (first index) is used when the
+                 * flashlight is not being used and the other (second index) is when it is being used.
+                 * `field_154` store live graphic details as it is the current state of the flashlight
+                 * intensity. Notice this is the live graphic details and not the target preset as this
+                 * is also used to handle the transition so the values can slowly fade.
+                 */
+    /* 0x1C  */ s_StructUnk3 field_1C[2]; /** Stores adjusted/updated values to then being used by `field_154`. */
+    /* 0x84  */ s_StructUnk3 field_84[2]; /** Stores current selected enviroment preset. */
+    /* 0xEC  */ s_StructUnk3 field_EC[2]; /** Stores previous selected enviroment preset. */
+    /* 0x154 */ s_StructUnk3 field_154;
 } s_SysWork_2388;
 STATIC_ASSERT_SIZEOF(s_SysWork_2388, 392);
 
@@ -442,13 +489,13 @@ typedef struct _SysWork
     /* 0x890    */ GsCOORDINATE2    playerBoneCoords[HarryBone_Count];
     /* 0xE30    */ GsCOORDINATE2    unkCoords_E30[5];                       // Might be part of previous array for 5 extra coords which go unused.
     /* 0xFC0    */ GsCOORDINATE2    npcBoneCoordBuffer[NPC_BONE_COUNT_MAX]; /** Contiguous NPC bone coord buffer. */
-    /* 0x2280   */ s8               npcFlagsId;                             // 1-based NPC ID for `npcFlags`.
+    /* 0x2280   */ s8               npcFlagId;                              // 1-based NPC ID for `npcFlags`.
     /* 0x2281   */ s8               loadingScreenIdx;
     /* 0x2282   */ s8               areaTransitionFlags;                /** `e_AreaTransitionFlags` */
     /* 0x2283   */ s8               sfxPairIdx;                         /** `e_SfxPairIdx` | Index into `SFX_PAIRS`. */
     /* 0x2284   */ u16              charaGroupFlags[CHARA_GROUP_COUNT]; /** `e_CharaGroupFlags` */
                                                                         // Enabling a flag for Larval Stalkers causes them to die.
-    /* 0x228C   */ s32              field_228C[1];
+    /* 0x228C   */ s32              field_228C[1];  // Spawn flags for enemy characters?
     /* 0x2290   */ s32              npcFlags;       // Flags related to NPCs. Each bit corresponds to an `npcs` array entry.
     /* 0x2294   */ s8               unused_2294[4]; /** @unused */
     /* 0x2298   */ e_ProcessFlags   processFlags;
@@ -462,17 +509,17 @@ typedef struct _SysWork
     /* 0x234A+0 */ u8               field_234A   : 8; /** `bool` */
     /* 0x234B+0 */ u8               field_234B_0 : 4; /** `bool` | Related to particles. Used to trigger SFX? */
     /* 0x234B+4 */ u8               field_234B_4 : 4; // Related to particles.
-    /* 0x234C   */ s32              mapMsgTimer;
-    /* 0x2350+0 */ u8               enableHighResGlyphs : 4; /** `bool` */
-    /* 0x2350+4 */ u8               silentYesSelection  : 4; /** `bool` */
-    /* 0x2351+0 */ u32              invItemSelectedIdx  : 8;
-    /* 0x2352+0 */ u32              invItemLoadFlags    : 8; /** `e_InvItemLoadFlags` */
-    /* 0x2353   */ s8               targetNpcIdx;            /** Index of the NPC in `npcs` being targeted by the player. */
+    /* 0x234C   */ q19_12           mapMsgTimer;
+    /* 0x2350+0 */ u8               enableHalfHeightGlyphs : 4; /** `bool` */
+    /* 0x2350+4 */ u8               silentYesSelection     : 4; /** `bool` */
+    /* 0x2351+0 */ u32              invItemSelectedIdx     : 8;
+    /* 0x2352+0 */ u32              invItemLoadFlags       : 8; /** `e_InvItemLoadFlags` */
+    /* 0x2353   */ s8               targetNpcIdx;               /** Index of the NPC in `npcs` being targeted by the player. */
     /* 0x2354   */ s8               npcIdxs[CHARA_GROUP_COUNT];
     /* 0x2358   */ u8               enablePlayerMatchAnim; /** `bool` | Activates the animation performed by Harry when lighting a match at the beginning of the game. */
     /* 0x2359   */ s8               unused_2359;           /** @unused */
     /* 0x235A   */ u8               playerStopFlags;       /** `e_PlayerStopFlags` */
-                // 1 byte of padding.
+                   // 1 byte of padding.
     /* 0x235C   */ GsCOORDINATE2*   lightBoneCoord;
     /* 0x2360   */ VECTOR3          lightPosition;      // } Often set to DMS cutscene data.
     /* 0x236C   */ GsCOORDINATE2*   lensFlareBoneCoord; // }
@@ -484,9 +531,9 @@ typedef struct _SysWork
     /* 0x2380   */ q19_12           cameraRadiusXz;
     /* 0x2384   */ q19_12           cameraY;
     /* 0x2388   */ s_SysWork_2388   field_2388;
-    /* 0x2510   */ s32              field_2510;
-    /* 0x2514   */ s_SysWork_2514   field_2514;
-    /* 0x254C   */ s8               field_254C[508]; /** Used through indirect pointer calls. Tied to `libkpad`.*/
+    /* 0x2510   */ s32              field_2510;                       // } Related to libkpad.
+    /* 0x2514   */ s_SysWork_2514   field_2514;                       // }
+    /* 0x254C   */ s8               field_254C[508];                  /** Used through indirect pointer calls. Tied to `libkpad`.*/
     /* 0x2748   */ q3_12            bgmLayerVolumes[BGM_LAYER_COUNT]; // Last index value is not a layer, but some sort of timer. See `Bgm_LayersUpdate`.
                    // 2 bytes of padding.
     /* 0x275C   */ q23_8            field_275C; // } SFX volumes?
@@ -648,7 +695,8 @@ static inline s32 Game_StateStepSet(s32 stepIdx, s32 stateStep)
     }
     else
     {
-        step = g_GameWork.gameStateSteps[2] = stateStep;
+        step                         =
+        g_GameWork.gameStateSteps[2] = stateStep;
     }
 
     return step;

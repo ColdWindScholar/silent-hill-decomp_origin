@@ -492,7 +492,7 @@ void MapEvent_DrainageValveInteract(void) // 0x800DAF18
             g_SysWork.playerWork.player.rotation.vy = Q12(0.25f);
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
 
             // Warp camera.
             Event_CameraPositionSet(NULL,
@@ -663,7 +663,7 @@ void MapEvent_DrainageValveInteract(void) // 0x800DAF18
 
             Event_ScreenFadeCmd(ScreenFadeCmd_Start, false, 2, 0, false);
             vcReturnPreAutoCamWork(true);
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             break;
     }
 
@@ -764,7 +764,7 @@ void MapEvent_DrainageValveInteract(void) // 0x800DAF18
             }
             else
             {
-                vol = Q12_MULT_PRECISE(D_800E20FC, Q12(1.0f) - (FP_TO(vol - Q12(1.0f), Q12_SHIFT) / Q12(16.0f)));
+                vol = Q12_MULT_PRECISE(D_800E20FC, Q12(1.0f) - Q12_DIV(vol - Q12(1.0f),  Q12(16.0f)));
             }
         }
 
@@ -966,7 +966,7 @@ void MapEvent_UnopenedCatLockerInspect(void) // 0x800DC310
                                   true);
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             SysWork_StateStepIncrement(0);
 
         case 3:
@@ -1028,7 +1028,7 @@ void MapEvent_UnopenedCatLockerInspect(void) // 0x800DC310
             Event_ScreenFadeCmd(ScreenFadeCmd_Start, false, 2, 0, false);
             SysWork_StateStepIncrement(0);
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             break;
 
         default:
@@ -1290,7 +1290,7 @@ void func_800DCDDC(void) // 0x800DCDDC
             Event_ScreenFadeCmd(ScreenFadeCmd_Start, true, 3, 0, false);
             Dms_HeaderFixOffsets((s_DmsHeader*)FS_BUFFER_13);
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             Game_TurnFlashlightOn();
             SysWork_StateStepIncrement(0);
 
@@ -1349,7 +1349,7 @@ void func_800DCDDC(void) // 0x800DCDDC
             Savegame_EventFlagSet(EventFlag_456);
             Event_InvItemCmd(InvItemCmd_AddItem, InvItemId_ChannelingStone, 1, false);
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
 
             g_Cutscene_Timer = NO_VALUE;
 
@@ -1436,7 +1436,8 @@ void Map_WorldObjectsUpdate(void) // 0x800DD688
                         }
 
                         // Warp camera.
-                        Event_CameraPositionSet(NULL, Q12(-61.18f), Q12(-3.0f), g_SysWork.playerWork.player.position.vz + Q12(0.49f),
+                        Event_CameraPositionSet(NULL,
+                                                Q12(-61.18f), Q12(-3.0f), g_SysWork.playerWork.player.position.vz + Q12(0.49f),
                                                 Q12(0.0f), Q12(0.0f), Q12(0.0f), Q12(0.0f),
                                                 D_800E62D0 == 0);
                         Event_CameraLookAtSet(NULL,
@@ -1507,7 +1508,10 @@ void Map_WorldObjectsUpdate(void) // 0x800DD688
         !Savegame_EventFlagGet(EventFlag_105))
     {
         // Warp camera.
-        Event_CameraPositionSet(NULL, Q12(-60.63f), Q12(-4.14f), Q12(17.42f), Q12(0.0f), Q12(0.0f), Q12(0.0f), Q12(0.0f), true);
+        Event_CameraPositionSet(NULL,
+                                Q12(-60.63f), Q12(-4.14f), Q12(17.42f),
+                                Q12(0.0f), Q12(0.0f), Q12(0.0f), Q12(0.0f),
+                                true);
         if (g_SysWork.playerWork.player.position.vz < Q12(18.5f))
         {
             Event_CameraLookAtSet(NULL,

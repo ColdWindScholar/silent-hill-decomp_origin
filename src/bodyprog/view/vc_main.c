@@ -214,7 +214,7 @@ void vcUserCamTarget(VECTOR3* cam_tgt_pos, VC_CAM_MV_PARAM* cam_prm_p, bool warp
     }
 }
 
-void vcChangeProjectionValue(s16 scr_y) // 0x80080D5C
+void vcChangeProjectionValue(q3_12 scr_y) // 0x80080D5C
 {
     vcWork.geom_screen_dist = scr_y;
 }
@@ -272,7 +272,7 @@ void vcSetSubjChara(VECTOR3* chara_pos,
     vcWork.chara_pos        = *chara_pos;
     vcWork.chara_bottom_y   = chara_bottom_y;
     vcWork.chara_top_y      = chara_top_y;
-    vcWork.chara_center_y   = (chara_bottom_y + chara_top_y) >> 1; // `/ 2`.
+    vcWork.chara_center_y   = DIV_FAST(chara_bottom_y + chara_top_y, 2);
     vcWork.chara_grnd_y     = chara_grnd_y;
     vcWork.chara_head_pos   = *chara_head_pos;
     vcWork.chara_mv_spd     = chara_mv_spd;
@@ -1816,7 +1816,7 @@ void vcSetWatchTgtYParam(VECTOR3* watch_pos, VC_WORK* w_p, s32 cam_mv_type, q19_
     }
 }
 
-void vcAdjustWatchYLimitHighWhenFarView(VECTOR3* watch_pos, VECTOR3* cam_pos, s16 sy) // 0x800835E0
+void vcAdjustWatchYLimitHighWhenFarView(VECTOR3* watch_pos, VECTOR3* cam_pos, q3_12 sy) // 0x800835E0
 {
     q3_12  max_cam_ang_x;
     q19_12 dist;
@@ -2422,12 +2422,12 @@ void vcCamTgtMvVecIsFlipedFromCharaFront(VECTOR3* tgt_mv_vec, VC_WORK* w_p, q19_
 
         if (max_x < min_x)
         {
-            min_x = (min_x + max_x) >> 1; // `/ 2`.
+            min_x = DIV_FAST(min_x + max_x, 2);
             max_x = min_x;
         }
         if (max_z < min_z)
         {
-            min_z = (min_z + max_z) >> 1; // `/ 2`.
+            min_z = DIV_FAST(min_z + max_z, 2);
             max_z = min_z;
         }
 

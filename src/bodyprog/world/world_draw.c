@@ -13,10 +13,60 @@
 #include "bodyprog/sound/sound_system.h"
 #include "bodyprog/text/text_draw.h"
 #include "main/fsqueue.h"
+#include "maps/characters/cybil.h"
+#include "maps/characters/dahlia.h"
+#include "maps/characters/kaufmann.h"
+#include "maps/characters/puppet_nurse.h"
+#include "maps/characters/split_head.h"
+#include "maps/characters/stalker.h"
 
-const s32 __pad_rodata_80025524 = 0;
+#ifndef PAD_HACK_IGNORE
+    const s32 __pad_rodata_80025524 = 0;
+    s16 __pad_800BCE14;
+#endif
 
+u16 g_CollisionTriggerFlags;
 s_WorldGfxWork g_WorldGfxWork;
+
+
+s32 Map_TypeGet(void) // 0x8003BD2C
+{
+    return g_WorldGfxWork.mapInfo - MAP_INFOS;
+}
+
+void Collision_FlagsLocationUpdate(const s_SubCharacter* chara) // 0x8003BD48
+{
+    u16 collFlags;
+
+    g_CollisionTriggerFlags = Collision_FlagsGet();
+    collFlags               = g_CollisionTriggerFlags;
+
+    switch (Map_TypeGet())
+    {
+        case MapType_THR:
+            if (chara->position.vx >= Q12(191.6f) && chara->position.vx <= Q12(198.8f) &&
+                chara->position.vz >= Q12(-96.0f) && chara->position.vz <= Q12(-90.3f))
+            {
+                collFlags = (collFlags & ~CollisionTriggerFlag_Objects) | CollisionTriggerFlag_2;
+            }
+            break;
+
+        case MapType_SPR:
+        case MapType_SPU:
+            if (chara->position.vx >= Q12(-100.0f) && chara->position.vx <= Q12(-94.5f) &&
+                chara->position.vz >= Q12(-70.3f)  && chara->position.vz <= Q12(-62.0f))
+            {
+                collFlags = (collFlags & ~CollisionTriggerFlag_Objects) | CollisionTriggerFlag_2;
+            }
+    }
+
+    Collision_FlagsSet(collFlags);
+}
+
+void Collision_FlagsUpdate(void) // 0x8003BE28
+{
+    Collision_FlagsSet(g_CollisionTriggerFlags);
+}
 
 // ========================================
 // WORLD INITALIZATION
@@ -358,21 +408,20 @@ bool WorldGfx_ChunkInitCheck(void) // 0x8003C850
     return WorldMap_ActiveModelsLoadStateCheck();
 }
 
-void WorldGfx_Draw(bool arg0) // 0x8003C878
+void WorldGfx_Draw(s32 otShift) // 0x8003C878
 {
     // Draw world objects.
     WorldObjects_DrawAllObjects(&g_WorldGfxWork);
 
-    // Load active chunk.
+    // Load and draw active chunks.
     while (WorldMap_NextChunkLoadCheck())
     {
         WorldGfx_CloseRangeChunksInit();
         Fs_QueueWaitForEmpty();
     }
+    WorldMap_ChunksDraw(&g_OrderingTable0[g_ActiveBufferIdx], otShift);
 
-    // Draw active chunks.
-    WorldMap_ChunksDraw(&g_OrderingTable0[g_ActiveBufferIdx], arg0);
-
+    // Draw 2D screen effects.
     WorldGfx_2dEffectsDraw();
 }
 
@@ -380,36 +429,38 @@ void WorldGfx_Draw(bool arg0) // 0x8003C878
 // OBJECTS DRAW
 // ========================================
 
-void WorldObject_ModelNameSet(s_WorldObjectModel* model, char* newStr) // 0x8003C8F8
+void WorldObject_ModelNameSet(s_WorldObjectModel* model, char* name) // 0x8003C8F8
 {
     model->metadata.modelLocation = WorldModelLocation_None;
     model->modelInfo.field_0      = 0;
 
-    StringCopy(model->metadata.name.str, newStr);
+    StringCopy(model->metadata.name.str, name);
 
     model->metadata.field_8 = 0;
 }
 
 void WorldObjects_Add(s_WorldObjectModel* model, const VECTOR3* pos, const SVECTOR3* rot) // 0x8003C92C
 {
-    q23_8          geomPosX;
-    q23_8          geomPosY;
-    q23_8          geomPosZ;
-    q21_10         geomRotX;
-    q19_12         geomRotY;
-    q21_10         geomRotZ;
+    q23_8          posX;
+    q23_8          posY;
+    q23_8          posZ;
+    q21_10         rotX;
+    q19_12         rotZ;
+    q21_10         rotY;
     s32            i;
     s32            modelLoc;
     s_WorldObject* obj;
 
-    // Check if array of world objects to draw is full.
+    // Submit world object if a slot is available.
     if (g_WorldGfxWork.objectCount < ARRAY_SIZE(g_WorldGfxWork.objects))
     {
         if (model->metadata.modelLocation == WorldModelLocation_None)
         {
             GameFs_CommonItemsTextureLoad();
 
-            modelLoc = WorldMap_ObjectModelLocationGet(model, &model->metadata, g_SysWork.playerWork.player.position.vx, g_SysWork.playerWork.player.position.vz);
+            modelLoc = WorldMap_ObjectModelLocationGet(model, &model->metadata,
+                                                       g_SysWork.playerWork.player.position.vx,
+                                                       g_SysWork.playerWork.player.position.vz);
             if (modelLoc == WorldModelLocation_None)
             {
                 if (Lm_ModelFind(model, &g_WorldGfxWork.itemLmHdr, &model->metadata))
@@ -426,42 +477,42 @@ void WorldObjects_Add(s_WorldObjectModel* model, const VECTOR3* pos, const SVECT
         }
 
         // Compute geometry position and rotation.
-        geomPosX = Q12_TO_Q8(pos->vx);
-        geomPosY = Q12_TO_Q8(pos->vy);
-        geomPosZ = Q12_TO_Q8(pos->vz);
-        geomRotX = Q12_TO_Q10(rot->vx);
-        geomRotY = Q12_TO_Q10(rot->vz);
-        geomRotZ = rot->vy;
+        posX = Q12_TO_Q8(pos->vx);
+        posY = Q12_TO_Q8(pos->vy);
+        posZ = Q12_TO_Q8(pos->vz);
+        rotX = Q12_TO_Q10(rot->vx);
+        rotZ = Q12_TO_Q10(rot->vz);
+        rotY = rot->vy;
 
         // Check if world object to draw was already submitted?
         for (i = 0; i < g_WorldGfxWork.objectCount; i++)
         {
             obj = &g_WorldGfxWork.objects[i];
 
-            if (model == obj->model &&
-                geomPosX == obj->positionX &&
-                geomPosZ == obj->positionZ &&
-                geomPosY == obj->positionY &&
-                geomRotX == obj->rotationX &&
-                geomRotZ == obj->rotationY &&
-                geomRotY == obj->rotationZ)
+            if (model == obj->model     &&
+                posX  == obj->positionX &&
+                posZ  == obj->positionZ &&
+                posY  == obj->positionY &&
+                rotX  == obj->rotationX &&
+                rotY  == obj->rotationY &&
+                rotZ  == obj->rotationZ)
             {
                 return;
             }
         }
 
-        // Submit world object to draw.
-        obj = &g_WorldGfxWork.objects[g_WorldGfxWork.objectCount];
-        obj->rotationX = geomRotX;
-        obj->rotationY = geomRotZ;
+        // Submit new world object to draw.
+        obj            = &g_WorldGfxWork.objects[g_WorldGfxWork.objectCount];
+        obj->rotationX = rotX;
+        obj->rotationY = rotY;
 
         if (obj->positionZ) {} // @hack Required for match.
 
-        obj->rotationZ = geomRotY;
+        obj->rotationZ = rotZ;
         obj->model     = model;
-        obj->positionX = geomPosX;
-        obj->positionY = geomPosY;
-        obj->positionZ = geomPosZ;
+        obj->positionX = posX;
+        obj->positionY = posY;
+        obj->positionZ = posZ;
 
         g_WorldGfxWork.objectCount++;
     }
@@ -1178,10 +1229,10 @@ void WorldGfx_CharaModelProcessLoad(s_CharaModel* model) // 0x8003D9C8
     }
 }
 
-void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 arg2, q3_12 timer, s32 arg4) // 0x8003DA9C
+void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 otShift, q3_12 timer, s32 paletteIdx) // 0x8003DA9C
 {
     CVECTOR tintColor = { 0 };
-    s16     ret;
+    s16     clutY;
 
     // Check if character is invalid.
     if (charaId == Chara_None)
@@ -1197,7 +1248,7 @@ void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 arg2, 
         WorldGfx_HeldItemDraw();
     }
 
-    ret = func_8003DD74(charaId, arg4);
+    clutY = WorldGfx_CharaClutYGet(charaId, paletteIdx);
 
     if (timer != Q12(0.0f))
     {
@@ -1209,8 +1260,8 @@ void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 arg2, 
                       g_WorldEnvWork.screenBrightness);
     }
 
-    func_80045534(&g_WorldGfxWork.registeredCharaModels[charaId]->skeleton, &g_OrderingTable0[g_ActiveBufferIdx], arg2,
-                  boneCoords, Q8_TO_Q12(CHARA_FILE_INFOS[charaId].field_6), ret, CHARA_FILE_INFOS[charaId].field_8);
+    func_80045534(&g_WorldGfxWork.registeredCharaModels[charaId]->skeleton, &g_OrderingTable0[g_ActiveBufferIdx], otShift,
+                  boneCoords, Q8_TO_Q12(CHARA_FILE_INFOS[charaId].field_6), clutY, CHARA_FILE_INFOS[charaId].field_8);
 
     if (timer != Q12(0.0f))
     {
@@ -1222,16 +1273,16 @@ void WorldGfx_CharaDraw(e_CharaId charaId, GsCOORDINATE2* boneCoords, s32 arg2, 
     }
 }
 
-s32 func_8003DD74(e_CharaId charaId, s32 arg1) // 0x8003DD74
+s32 WorldGfx_CharaClutYGet(e_CharaId charaId, s32 paletteIdx) // 0x8003DD74
 {
-    return (arg1 << 10) & 0xFC00;
+    return (paletteIdx << 10) & 0xFC00;
 }
 
 // ========================================
-// ITEM ATTACHMENT
+// MESH SWAP
 // ========================================
 
-void WorldGfx_HeldItemAttach(e_CharaId charaId, s32 modelBone) // 0x8003DD80
+void WorldGfx_CharaMeshSwap(e_CharaId charaId, s32 meshSwapStatus) // 0x8003DD80
 {
     s_CharaModel* model;
 
@@ -1240,50 +1291,50 @@ void WorldGfx_HeldItemAttach(e_CharaId charaId, s32 modelBone) // 0x8003DD80
     switch (charaId)
     {
         case Chara_Harry:
-            func_8003DE60(&model->skeleton, modelBone);
+            WorldGfx_HarryMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_Stalker:
-            func_8003E388(&model->skeleton, modelBone);
+            WorldGfx_StalkerMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_Cybil:
         case Chara_EndingCybil:
-            func_8003DF84(&model->skeleton, modelBone);
+            WorldGfx_CybilMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_MonsterCybil:
-            func_8003E08C(&model->skeleton, modelBone);
+            WorldGfx_MonsterCybilMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_Dahlia:
         case Chara_EndingDahlia:
-            func_8003E194(&model->skeleton, modelBone);
+            WorldGfx_DahliaMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_Kaufmann:
         case Chara_EndingKaufmann:
-            func_8003E238(&model->skeleton, modelBone);
+            WorldGfx_KaufmannMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_SplitHead:
-            func_8003E414(&model->skeleton, modelBone);
+            WorldGfx_SplitHeadMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_PuppetNurse:
-            func_8003E4A0(&model->skeleton, modelBone);
+            WorldGfx_PuppetNurseMeshSwap(&model->skeleton, meshSwapStatus);
             break;
 
         case Chara_PuppetDoctor:
-            func_8003E544(&model->skeleton, modelBone);
+            WorldGfx_PuppetDoctorMeshSwap(&model->skeleton, meshSwapStatus);
             break;
     }
 }
 
-void func_8003DE60(s_Skeleton* skel, s32 modelBone) // 0x8003DE60
+void WorldGfx_HarryMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003DE60
 {
-    s32 variantIdx;
-    s32 idx1;
+    s32 variantId;
+    s32 swappableId;
 
     static s32 D_800A9ECC = 0xFE16FD13;
     static s32 D_800A9ED0 = 0x0000FE13;
@@ -1295,93 +1346,95 @@ void func_8003DE60(s_Skeleton* skel, s32 modelBone) // 0x8003DE60
     static s32 D_800A9EE8 = 0x0000FE11;
     static s32 D_800A9EEC = 0x0000FE12;
 
-    // Process mesh variant.
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != HarryHandMesh_0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != HarryVariantMesh_None)
     {
         func_80045468(skel, &D_800A9ECC, false);
 
-        switch (variantIdx)
+        switch (variantId)
         {
-            case HarryHandMesh_1:
+            case HarryVariantMesh_RightHandEmpty:
                 func_80045468(skel, &D_800A9ED0, true);
                 break;
 
-            case HarryHandMesh_2:
+            case HarryVariantMesh_HandMelee:
                 func_80045468(skel, &D_800A9ED4, true);
                 break;
 
-            case HarryHandMesh_3:
+            case HarryVariantMesh_RightHandGun:
                 func_80045468(skel, &D_800A9ED8, true);
                 break;
 
-            case HarryHandMesh_4:
+            case HarryVariantMesh_RightHandRifle:
                 func_80045468(skel, &D_800A9EDC, true);
                 break;
 
-            case HarryHandMesh_5:
+            case HarryVariantMesh_5:
                 func_80045468(skel, &D_800A9EE0, true);
                 break;
         }
     }
 
-    // Process second masked value.
-    idx1 = MODEL_BONE_IDX_1_GET(modelBone);
-    if (idx1 != 0)
+    // Process swappable mesh.
+    swappableId = MESH_SWAP_STATUS_SWAPPABLE_ID_GET(meshSwapStatus);
+    if (swappableId != HarrySwappableMesh_None)
     {
         func_80045468(skel, &D_800A9EE4, false);
 
-        switch (idx1)
+        switch (swappableId)
         {
-            case MODEL_BONE(0, 1):
+            case MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarrySwappableMesh_None):
                 func_80045468(skel, &D_800A9EE8, true);
                 break;
 
-            case MODEL_BONE(0, 2):
+            case MESH_SWAP_STATUS(HarrySwappableMesh_LeftHand, HarrySwappableMesh_None):
                 func_80045468(skel, &D_800A9EEC, true);
                 break;
         }
     }
 }
 
-void func_8003DF84(s_Skeleton* skel, s32 modelBone) // 0x8003DF84
+void WorldGfx_CybilMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003DF84
 {
-    s32 variantIdx;
-    s32 idx1;
+    s32 variantId;
+    s32 swappableId;
 
     static s32 D_800A9EF0 = 0x0000FE14;
     static s32 D_800A9EF4 = 0x00FE1514;
     static s32 D_800A9EF8 = 0x0000FE12;
     static s32 D_800A9EFC = 0x00FE1312;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != CybilVariantMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case CybilVariantMesh_1:
                 func_80045468(skel, &D_800A9EF4, false);
                 func_80045468(skel, &D_800A9EF0, true);
                 break;
 
-            case 2:
+            case CybilVariantMesh_2:
                 func_80045468(skel, &D_800A9EF0, false);
                 func_80045468(skel, &D_800A9EF4, true);
                 break;
         }
     }
 
-    variantIdx = MODEL_BONE_IDX_1_GET(modelBone);
-    if (variantIdx != 0)
+    // Process swappable mesh.
+    variantId = MESH_SWAP_STATUS_SWAPPABLE_ID_GET(meshSwapStatus);
+    if (variantId != CybilSwappableMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case MODEL_BONE(0, 1):
+            case MESH_SWAP_STATUS(CybilSwappableMesh_1, CybilVariantMesh_None):
                 func_80045468(skel, &D_800A9EFC, false);
                 func_80045468(skel, &D_800A9EF8, true);
                 break;
 
-            case MODEL_BONE(0, 2):
+            case MESH_SWAP_STATUS(CybilSwappableMesh_2, CybilVariantMesh_None):
                 func_80045468(skel, &D_800A9EF8, false);
                 func_80045468(skel, &D_800A9EFC, true);
                 break;
@@ -1389,43 +1442,45 @@ void func_8003DF84(s_Skeleton* skel, s32 modelBone) // 0x8003DF84
     }
 }
 
-void func_8003E08C(s_Skeleton* skel, s32 modelBone) // 0x8003E08C
+void WorldGfx_MonsterCybilMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E08C
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F00 = 0x0000FE02;
     static s32 D_800A9F04 = 0x0000FE03;
     static s32 D_800A9F08 = 0x0000FE00;
     static s32 D_800A9F0C = 0x00FE0100;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != CybilVariantMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case CybilVariantMesh_1:
                 func_80045468(skel, &D_800A9F04, false);
                 func_80045468(skel, &D_800A9F00, true);
                 break;
 
-            case 2:
+            case CybilVariantMesh_2:
                 func_80045468(skel, &D_800A9F00, false);
                 func_80045468(skel, &D_800A9F04, true);
                 break;
         }
     }
 
-    variantIdx = MODEL_BONE_IDX_1_GET(modelBone);
-    if (variantIdx != 0)
+    // Process swappable mesh.
+    variantId = MESH_SWAP_STATUS_SWAPPABLE_ID_GET(meshSwapStatus);
+    if (variantId != CybilSwappableMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case MODEL_BONE(0, 1):
+            case MESH_SWAP_STATUS(CybilSwappableMesh_1, CybilVariantMesh_None):
                 func_80045468(skel, &D_800A9F0C, false);
                 func_80045468(skel, &D_800A9F08, true);
                 break;
 
-            case MODEL_BONE(0, 2):
+            case MESH_SWAP_STATUS(CybilSwappableMesh_2, CybilVariantMesh_None):
                 func_80045468(skel, &D_800A9F08, false);
                 func_80045468(skel, &D_800A9F0C, true);
                 break;
@@ -1433,41 +1488,42 @@ void func_8003E08C(s_Skeleton* skel, s32 modelBone) // 0x8003E08C
     }
 }
 
-void func_8003E194(s_Skeleton* skel, s32 modelBone) // 0x8003E194
+void WorldGfx_DahliaMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E194
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F10 = 0xFE03FD00;
     static s32 D_800A9F14 = 0x0000FE00;
     static s32 D_800A9F18 = 0x00FE0201;
     static s32 D_800A9F1C = 0x0000FE03;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != DahliaVariantMesh_None)
     {
         func_80045468(skel, &D_800A9F10, false);
 
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case DahliaVariantMesh_1:
                 func_80045468(skel, &D_800A9F14, true);
                 break;
 
-            case 2:
+            case DahliaVariantMesh_2:
                 func_80045468(skel, &D_800A9F18, true);
                 break;
 
-            case 3:
+            case DahliaVariantMesh_3:
                 func_80045468(skel, &D_800A9F1C, true);
                 break;
         }
     }
 }
 
-void func_8003E238(s_Skeleton* skel, s32 modelBone) // 0x8003E238
+void WorldGfx_KaufmannMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E238
 {
-    s32 variantIdx;
-    s32 idx1;
+    s32 variantId;
+    s32 swappableId;
 
     static s32 D_800A9F20 = 0x06050403;
     static s32 D_800A9F24 = 0x000000FE; // @unused
@@ -1480,72 +1536,74 @@ void func_8003E238(s_Skeleton* skel, s32 modelBone) // 0x8003E238
     static s32 D_800A9F40 = 0x0000FE01;
     static s32 D_800A9F44 = 0x00FE0201;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != KaufmannVariantMesh_None)
     {
         func_80045468(skel, &D_800A9F20, false);
 
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case KaufmannVariantMesh_1:
                 func_80045468(skel, &D_800A9F28, true);
                 break;
 
-            case 2:
+            case KaufmannVariantMesh_2:
                 func_80045468(skel, &D_800A9F2C, true);
                 break;
 
-            case 3:
+            case KaufmannVariantMesh_3:
                 func_80045468(skel, &D_800A9F30, true);
                 break;
 
-            case 4:
+            case KaufmannVariantMesh_4:
                 func_80045468(skel, &D_800A9F34, true);
                 break;
         }
     }
 
-
-    idx1 = MODEL_BONE_IDX_1_GET(modelBone);
-    if (idx1 != 0)
+    // Process swappable mesh.
+    swappableId = MESH_SWAP_STATUS_SWAPPABLE_ID_GET(meshSwapStatus);
+    if (swappableId != KaufmannSwappableMesh_None)
     {
         func_80045468(skel, &D_800A9F38, false);
 
-        switch (idx1)
+        switch (swappableId)
         {
-            case MODEL_BONE(0, 1):
+            case MESH_SWAP_STATUS(KaufmannSwappableMesh_1, KaufmannVariantMesh_None):
                 func_80045468(skel, &D_800A9F3C, true);
                 break;
 
-            case MODEL_BONE(0, 2):
+            case MESH_SWAP_STATUS(KaufmannSwappableMesh_2, KaufmannVariantMesh_None):
                 func_80045468(skel, &D_800A9F40, true);
                 break;
 
-            case MODEL_BONE(0, 3):
+            case MESH_SWAP_STATUS(KaufmannSwappableMesh_3, KaufmannVariantMesh_None):
                 func_80045468(skel, &D_800A9F44, true);
                 break;
         }
     }
 }
 
-void func_8003E388(s_Skeleton* skel, s32 modelBone) // 0x8003E388
+void WorldGfx_StalkerMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E388
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F48 = 0x0000FE05;
     static s32 D_800A9F4C = 0x0000FE06;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != StalkerVariantMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case StalkerVariantMesh_1:
                 func_80045468(skel, &D_800A9F4C, false);
                 func_80045468(skel, &D_800A9F48, true);
                 break;
 
-            case 2:
+            case StalkerVariantMesh_2:
                 func_80045468(skel, &D_800A9F48, false);
                 func_80045468(skel, &D_800A9F4C, true);
                 break;
@@ -1553,24 +1611,25 @@ void func_8003E388(s_Skeleton* skel, s32 modelBone) // 0x8003E388
     }
 }
 
-void func_8003E414(s_Skeleton* skel, s32 modelBone) // 0x8003E414
+void WorldGfx_SplitHeadMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E414
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F50 = 0xFE19FD11;
     static s32 D_800A9F54 = 0xFE22FD1A;
 
-    variantIdx = modelBone & 0x3;
-    if (variantIdx != 0)
+    // @note Unique disuse of `MESH_SWAP_STATUS_VARIANT_ID_GET`. This masks bits 0-1 instead of 0-3.
+    variantId = meshSwapStatus & 0x3;
+    if (variantId != SplitHeadVariantMesh_None)
     {
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case SplitHeadVariantMesh_1:
                 func_80045468(skel, &D_800A9F50, false);
                 func_80045468(skel, &D_800A9F54, true);
                 break;
 
-            case 2:
+            case SplitHeadVariantMesh_2:
                 func_80045468(skel, &D_800A9F54, false);
                 func_80045468(skel, &D_800A9F50, true);
                 break;
@@ -1578,9 +1637,9 @@ void func_8003E414(s_Skeleton* skel, s32 modelBone) // 0x8003E414
     }
 }
 
-void func_8003E4A0(s_Skeleton* skel, s32 modelBone) // 0x8003E4A0
+void WorldGfx_PuppetNurseMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E4A0
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F58 = 0x05040302;
     static s32 D_800A9F5C = 0x00FE0706; // @unused
@@ -1588,31 +1647,32 @@ void func_8003E4A0(s_Skeleton* skel, s32 modelBone) // 0x8003E4A0
     static s32 D_800A9F64 = 0x00FE0603;
     static s32 D_800A9F68 = 0x00FE0704;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != PuppetNurseVariantMesh_None)
     {
         func_80045468(skel, &D_800A9F58, false);
 
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case PuppetNurseVariantMesh_Head1:
                 func_80045468(skel, &D_800A9F60, true);
                 break;
 
-            case 2:
+            case PuppetNurseVariantMesh_Head2:
                 func_80045468(skel, &D_800A9F64, true);
                 break;
 
-            case 3:
+            case PuppetNurseVariantMesh_Head3:
                 func_80045468(skel, &D_800A9F68, true);
                 break;
         }
     }
 }
 
-void func_8003E544(s_Skeleton* skel, s32 modelBone) // 0x8003E544
+void WorldGfx_PuppetDoctorMeshSwap(s_Skeleton* skel, s32 meshSwapStatus) // 0x8003E544
 {
-    s32 variantIdx;
+    s32 variantId;
 
     static s32 D_800A9F6C = 0x05040302;
     static s32 D_800A9F70 = 0x00FE0706; // @unused
@@ -1620,22 +1680,23 @@ void func_8003E544(s_Skeleton* skel, s32 modelBone) // 0x8003E544
     static s32 D_800A9F78 = 0x00FE0603;
     static s32 D_800A9F7C = 0x00FE0704;
 
-    variantIdx = MODEL_BONE_MESH_VARIANT_IDX_GET(modelBone);
-    if (variantIdx != 0)
+    // Process variant mesh.
+    variantId = MESH_SWAP_STATUS_VARIANT_ID_GET(meshSwapStatus);
+    if (variantId != PuppetNurseVariantMesh_None)
     {
         func_80045468(skel, &D_800A9F6C, false);
 
-        switch (variantIdx)
+        switch (variantId)
         {
-            case 1:
+            case PuppetNurseVariantMesh_Head1:
                 func_80045468(skel, &D_800A9F74, true);
                 break;
 
-            case 2:
+            case PuppetNurseVariantMesh_Head2:
                 func_80045468(skel, &D_800A9F78, true);
                 break;
 
-            case 3:
+            case PuppetNurseVariantMesh_Head3:
                 func_80045468(skel, &D_800A9F7C, true);
                 break;
         }

@@ -106,28 +106,28 @@ static inline void sharedFunc_800CDAA8_0_s02_Switch(void)
             case WEAPON_ATTACK(EquippedWeaponId_Chainsaw,     AttackInputType_Multitap):
             case WEAPON_ATTACK(EquippedWeaponId_Katana,       AttackInputType_Multitap):
             case WEAPON_ATTACK(EquippedWeaponId_Axe,          AttackInputType_Multitap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_2, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_HandMelee));
                 break;
 
             case WEAPON_ATTACK(EquippedWeaponId_Handgun,      AttackInputType_Tap):
             case WEAPON_ATTACK(EquippedWeaponId_Shotgun,      AttackInputType_Tap):
             case WEAPON_ATTACK(EquippedWeaponId_HyperBlaster, AttackInputType_Tap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_3, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandGun));
                 break;
 
             case WEAPON_ATTACK(EquippedWeaponId_HuntingRifle, AttackInputType_Tap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_4, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandRifle));
                 break;
         }
     }
     else
     {
         func_8003D03C();
-        WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_1, 1));
+        WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandEmpty));
     }
 }
 
-// Slight change in `PlayerState_Unk55` version
+// Slight change in `PlayerState_WalkBackward` version
 static inline void sharedFunc_800CDAA8_0_s02_Switch_Unk85(s_PlayerExtra* extra)
 {
     if (g_SysWork.playerWork.extra.state == PlayerState_Reset)
@@ -157,17 +157,17 @@ static inline void sharedFunc_800CDAA8_0_s02_Switch_Unk85(s_PlayerExtra* extra)
             case WEAPON_ATTACK(EquippedWeaponId_Chainsaw,     AttackInputType_Multitap):
             case WEAPON_ATTACK(EquippedWeaponId_Katana,       AttackInputType_Multitap):
             case WEAPON_ATTACK(EquippedWeaponId_Axe,          AttackInputType_Multitap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_2, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_HandMelee));
                 break;
 
             case WEAPON_ATTACK(EquippedWeaponId_Handgun,      AttackInputType_Tap):
             case WEAPON_ATTACK(EquippedWeaponId_Shotgun,      AttackInputType_Tap):
             case WEAPON_ATTACK(EquippedWeaponId_HyperBlaster, AttackInputType_Tap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_3, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandGun));
                 break;
 
             case WEAPON_ATTACK(EquippedWeaponId_HuntingRifle, AttackInputType_Tap):
-                WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_4, 1));
+                WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandRifle));
                 break;
         }
     }
@@ -177,11 +177,11 @@ static inline void sharedFunc_800CDAA8_0_s02_Switch_Unk85(s_PlayerExtra* extra)
 
         if (extra->model.anim.keyframeIdx >= 958)
         {
-            WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_5, 1));
+            WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_5));
         }
         else
         {
-            WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandEmpty));
         }
     }
 }
@@ -237,13 +237,13 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -274,13 +274,13 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -313,13 +313,13 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -330,8 +330,8 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
             break;
 #endif
 
-#ifdef HAS_PlayerState_Unk53
-        case PlayerState_Unk53:
+#ifdef HAS_PlayerState_WalkForward
+        case PlayerState_WalkForward:
             if (playerProps.moveSpeed > Q12(1.4f))
             {
                 playerProps.moveSpeed -= TIMESTEP_SCALE_30_FPS(g_DeltaTime, Q12(0.4f)) * 2;
@@ -362,17 +362,17 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 0:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk54);
+                case PlayerCutsceneState_RunForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_RunForward);
                     break;
 
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -383,8 +383,8 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
             break;
 #endif
 
-#ifdef HAS_PlayerState_Unk54
-        case PlayerState_Unk54:
+#ifdef HAS_PlayerState_RunForward
+        case PlayerState_RunForward:
             if (playerProps.moveSpeed > Q12(4.0f))
             {
                 playerProps.moveSpeed -= TIMESTEP_SCALE_30_FPS(g_DeltaTime, Q12(0.4f));
@@ -410,17 +410,17 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 1:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk53);
+                case PlayerCutsceneState_WalkForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_WalkForward);
                     break;
 
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -432,8 +432,8 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
             break;
 #endif
 
-#ifdef HAS_PlayerState_Unk55
-        case PlayerState_Unk55:
+#ifdef HAS_PlayerState_WalkBackward
+        case PlayerState_WalkBackward:
             g_Player_MoveSpeed = playerProps.moveSpeed;
 
             Model_AnimStatusSet(&extra->model, HarryAnim_WalkBackward, false);
@@ -472,17 +472,17 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 0:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk54);
+                case PlayerCutsceneState_RunForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_RunForward);
                     break;
 
-                case 1:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk53);
+                case PlayerCutsceneState_WalkForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_WalkForward);
                     break;
 
-                case 4:
+                case PlayerCutsceneState_TurnLeft:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnLeft);
                     break;
             }
@@ -517,17 +517,17 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
                 extra->model.controlState++;
             }
 
-            switch (D_800C457C)
+            switch (g_Player_CutsceneState)
             {
-                case 0:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk54);
+                case PlayerCutsceneState_RunForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_RunForward);
                     break;
 
-                case 1:
-                    Player_ExtraStateSet(player, extra, PlayerState_Unk53);
+                case PlayerCutsceneState_WalkForward:
+                    Player_ExtraStateSet(player, extra, PlayerState_WalkForward);
                     break;
 
-                case 3:
+                case PlayerCutsceneState_TurnRight:
                     Player_ExtraStateSet(player, extra, PlayerState_TurnRight);
                     break;
             }
@@ -637,7 +637,7 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
             func_8007FB94(player, extra, ANIM_STATUS(180, true));
 #ifdef MAP1_S03
             func_8003D03C();
-            WorldGfx_HeldItemAttach(Chara_Harry, MODEL_BONE(HarryHandMesh_1, 1));
+            WorldGfx_CharaMeshSwap(Chara_Harry, MESH_SWAP_STATUS(HarrySwappableMesh_RightHand, HarryVariantMesh_RightHandEmpty));
 #else
             keyframeIdx = 949;
             sharedFunc_800CDAA8_0_s02_Switch_Unk85(extra);
@@ -1772,15 +1772,15 @@ void sharedFunc_800CDAA8_0_s02(s_SubCharacter* player, s_PlayerExtra* extra, GsC
             break;
 #endif
 
-#ifdef HAS_PlayerState_Unk53
-        case PlayerState_Unk53:
+#ifdef HAS_PlayerState_WalkForward
+        case PlayerState_WalkForward:
             Player_FootstepSfxPlay(5, player, 18, 6, footstepSfxId, pitch0);
             playerProps.flags |= PlayerFlag_Moving;
             break;
 #endif
 
-#ifdef HAS_PlayerState_Unk54
-        case PlayerState_Unk54:
+#ifdef HAS_PlayerState_RunForward
+        case PlayerState_RunForward:
             if (Player_FootstepSfxPlay(7, player, 31, 41, footstepSfxId, pitch1) != false)
             {
                 player->properties.player.runStepSfxCount++;

@@ -295,7 +295,7 @@ void Map_WorldObjectsInit(void) // 0x800D8818
 
     if (g_SavegamePtr->gameDifficulty == GameDifficulty_Easy)
     {
-        g_SysWork.npcFlagsId = 3;
+        g_SysWork.npcFlagId = 3;
     }
 
     WorldObject_ModelNameSet(&g_CommonWorldObjects[0], g_CommonWorldObjectNames[2]);
@@ -355,7 +355,7 @@ void Map_WorldObjectsUpdate(void) // 0x800D89A0
         }
         else
         {
-            collFlags = CollisionTriggerFlag_1;
+            collFlags = CollisionTriggerFlag_Objects;
         }
 
         Collision_FlagBitsSet(collFlags);

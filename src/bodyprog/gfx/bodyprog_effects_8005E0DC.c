@@ -381,10 +381,10 @@ void func_8005E89C(void) // 0x8005E89C
     ptr->field_0.vy = Q8(posY);
     ptr->field_0.vz = Q8(posZ);
 
-    Vw_WorldScreenMatrixAtPositionGet(&ptr->field_C, Q12(posX), Q12(posY), Q12(posZ));
+    Vw_WorldScreenMatrixAtPositionGet(&ptr->worldToScreenMat, Q12(posX), Q12(posY), Q12(posZ));
 
-    gte_SetRotMatrix(&ptr->field_C);
-    gte_SetTransMatrix(&ptr->field_C);
+    gte_SetRotMatrix(&ptr->worldToScreenMat);
+    gte_SetTransMatrix(&ptr->worldToScreenMat);
     gte_ReadGeomScreen(&ptr->field_2C);
 
     vwGetViewAngle(&sp10);
@@ -1281,7 +1281,7 @@ bool func_80060044(POLY_FT4** poly, s32 idx) // 0x80060044
         *(s32*)&(*poly)->u3 = (((ptr->field_164 << 5) + ptr->field_174) << 8) + ((ptr->field_150 << 5) + ptr->field_160);
     }
 
-    if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 3))
+    if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)))
     {
         if (g_GameWork.config.extraBloodColor == 14)
         {
@@ -1435,8 +1435,8 @@ bool func_800611C0(POLY_FT4** poly, s32 idx) // 0x800611C0
 
             *ptr = sp10;
 
-            gte_SetRotMatrix(&ptr->field_0.field_C);
-            gte_SetTransMatrix(&ptr->field_0.field_C);
+            gte_SetRotMatrix(&ptr->field_0.worldToScreenMat);
+            gte_SetTransMatrix(&ptr->field_0.worldToScreenMat);
         }
 
         return true;
@@ -1704,7 +1704,7 @@ bool func_800611C0(POLY_FT4** poly, s32 idx) // 0x800611C0
 
     setSemiTrans(*poly, true);
 
-    if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3))
+    if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)))
     {
         *(s32*)&(*poly)->u0 = ((ptr->field_190 + ptr->field_194) << 8) + 0x930000 + (ptr->field_17C + ptr->field_180);
         func_80055A90(&ptr->field_12C, &ptr->field_130, var_t0, ptr->field_158 * 16);
@@ -1924,8 +1924,8 @@ bool func_80062708(POLY_FT4** poly, s32 idx) // 0x80062708
 
         *ptr = sp10;
 
-        gte_SetRotMatrix(&ptr->field_0.field_C);
-        gte_SetTransMatrix(&ptr->field_0.field_C);
+        gte_SetRotMatrix(&ptr->field_0.worldToScreenMat);
+        gte_SetTransMatrix(&ptr->field_0.worldToScreenMat);
     }
 
     ptr->field_210 = (g_MapOverlayHdr.unkTable1_4C[idx].field_B << 13) + 224;
@@ -2010,7 +2010,7 @@ bool func_80062708(POLY_FT4** poly, s32 idx) // 0x80062708
                 temp_s2 = 160;
             }
 
-            if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 3))
+            if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)))
             {
                 func_80055A90(&ptr->field_12C, &ptr->field_130, temp_s2, ptr->field_20C * 0x10);
                 *(u16*)&(*poly)->r0 = ptr->field_12C.r + (ptr->field_12C.g << 8);
@@ -2334,8 +2334,8 @@ bool func_80063A50(POLY_FT4** poly, s32 idx) // 0x80063A50
             gte_stlvnl(&ptr->field_16C[ptr->field_1D8]);
         }
 
-        gte_SetRotMatrix(&ptr->field_0.field_C);
-        gte_SetTransMatrix(&ptr->field_0.field_C);
+        gte_SetRotMatrix(&ptr->field_0.worldToScreenMat);
+        gte_SetTransMatrix(&ptr->field_0.worldToScreenMat);
 
         for (ptr->field_1D8 = 0; ptr->field_1D8 < 3; ptr->field_1D8++)
         {
@@ -2371,7 +2371,7 @@ bool func_80063A50(POLY_FT4** poly, s32 idx) // 0x80063A50
 
         *(s32*)&(*poly)->x3 = *(s32*)&ptr->field_1CC;
 
-        if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 3))
+        if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)))
         {
             *(s32*)&(*poly)->r0 = 0x2E103030;
         }
@@ -2381,10 +2381,10 @@ bool func_80063A50(POLY_FT4** poly, s32 idx) // 0x80063A50
         }
 
         *(s32*)&(*poly)->u0 = g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0xD380FF : 0xD380E0;
-        *(s32*)&(*poly)->u1 = (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0xFF : 0xE0) +
+        *(s32*)&(*poly)->u1 = (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 255 : 224) +
                               (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0x2B7FE1 : 0x2B801F);
         *(u16*)&(*poly)->u2 = g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0x9FFF : 0x9FE0;
-        *(u16*)&(*poly)->u3 = (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0xFF : 0xE0) -
+        *(u16*)&(*poly)->u3 = (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 255 : 224) -
                               (g_MapOverlayHdr.unkTable1_4C[idx].field_B ? 0x611F : 0x60E1);
 
         addPrimFast(&g_OrderingTable0[g_ActiveBufferIdx].org[ptr->field_1BC >> 3], (*poly), 9);
@@ -2398,8 +2398,8 @@ bool func_80064334(POLY_FT4** poly, s32 idx) // 0x80064334
 {
     s32              temp_s0;
     s32              temp_s4;
-    s32              temp_v0_2;
-    s32              temp_v0_3;
+    s32              windSpeedX;
+    s32              windSpeedZ;
     q19_12           temp_v1_5;
     s_func_80064334* ptr;
     POLY_FT4*        next;
@@ -2426,10 +2426,10 @@ bool func_80064334(POLY_FT4** poly, s32 idx) // 0x80064334
 
     ptr->field_15A = g_MapOverlayHdr.unkTable1_4C[idx].field_C.s_0.field_2;
 
-    temp_v0_2 = *g_MapOverlayHdr.windSpeedX >> 6;
-    temp_v0_3 = *g_MapOverlayHdr.windSpeedZ >> 6;
-
-    g_MapOverlayHdr.unkTable1_4C[idx].field_C.s_0.field_2 += temp_s4 + (((SquareRoot0((temp_v0_2 * temp_v0_2) + (temp_v0_3 * temp_v0_3)) << 6) * temp_s4) >> 10);
+    // TODO: Use macro here.
+    windSpeedX = *g_MapOverlayHdr.particleWindSpeedX >> 6;
+    windSpeedZ = *g_MapOverlayHdr.particleWindSpeedZ >> 6;
+    g_MapOverlayHdr.unkTable1_4C[idx].field_C.s_0.field_2 += temp_s4 + (((SquareRoot0(SQUARE(windSpeedX) + SQUARE(windSpeedZ)) << 6) * temp_s4) >> 10);
 
     if (ptr->field_168 < (u16)g_MapOverlayHdr.unkTable1_4C[idx].field_C.s_0.field_2)
     {
@@ -2481,7 +2481,7 @@ bool func_80064334(POLY_FT4** poly, s32 idx) // 0x80064334
         ptr->field_15C = CLAMP_LOW(120 - (ptr->field_15A * 120) / ptr->field_168, 0);
     }
 
-    if (!(g_SysWork.field_2388.field_154.effectsInfo.field_0.field_0 & 0x3))
+    if (!(g_SysWork.field_2388.field_154.effectsInfo.flags.field_0 & (SpecialEnvEventFlags_DarkEnvironment | SpecialEnvEventFlags_FlashlightAllowed)))
     {
         func_80055A90(&ptr->field_134, &ptr->field_130, ptr->field_15C, ptr->field_150 * 16);
 
@@ -2529,18 +2529,18 @@ bool func_80064334(POLY_FT4** poly, s32 idx) // 0x80064334
 
         if (*g_MapOverlayHdr.data_190 != 0)
         {
-            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedX) >> 2;
-            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedZ) >> 2;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedX) >> 2;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedZ) >> 2;
         }
         else if (*g_MapOverlayHdr.data_18C != 0)
         {
-            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedX) >> 1;
-            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedZ) >> 1;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedX) >> 1;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedZ) >> 1;
         }
         else
         {
-            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += (TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedX) * 2) / 3;
-            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += (TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.windSpeedZ) * 2) / 3;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_0.vx_0 += (TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedX) * 2) / 3;
+            g_MapOverlayHdr.unkTable1_4C[idx].field_4.vz_4 += (TIMESTEP_SCALE_30_FPS(temp_s4, *g_MapOverlayHdr.particleWindSpeedZ) * 2) / 3;
         }
     }
 
@@ -2593,7 +2593,7 @@ bool func_80064FC0(POLY_FT4** polys, s32 idx) // 0x80064FC0
     setXY2Fast(*polys, (u16)ptr->field_13C.vx - (u16)ptr->field_144, ptr->field_13C.vy - ptr->field_144);
     setXY3Fast(*polys, (u16)ptr->field_13C.vx + (u16)ptr->field_144, ptr->field_13C.vy - ptr->field_144);
     *(u16*)&(*polys)->r0 = 0x1020;
-    (*polys)->b0         = 0x10;
+    (*polys)->b0         = 16;
 
     setSemiTrans((*polys), true);
 
@@ -2602,7 +2602,7 @@ bool func_80064FC0(POLY_FT4** polys, s32 idx) // 0x80064FC0
     *(u16*)&(*polys)->u2 = 0x3F00;
     *(u16*)&(*polys)->u3 = 0x3F3F;
 
-    addPrim(&g_OrderingTable0[g_ActiveBufferIdx].org[(ptr->field_140 - 0x20) >> 3], (*polys));
+    addPrim(&g_OrderingTable0[g_ActiveBufferIdx].org[(ptr->field_140 - 32) >> 3], (*polys));
 
     *polys += 1;
     return true;

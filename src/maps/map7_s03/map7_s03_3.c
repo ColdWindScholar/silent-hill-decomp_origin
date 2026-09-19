@@ -991,7 +991,7 @@ void func_800E3390(void) // 0x800E3390
             g_Cutscene_Timer = Q12(0.0f);
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             func_800E94AC();
             func_800E94F4();
             Anim_CharaTypeAnimInfoClear();
@@ -1192,7 +1192,7 @@ void func_800E3390(void) // 0x800E3390
             g_Cutscene_Timer = NO_VALUE;
 
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
             SD_Call(19);
             func_800E14DC(&g_SysWork.playerWork.player, &g_SysWork.npcs[2], 1);
 
@@ -1221,7 +1221,7 @@ void func_800E3B6C(void) // 0x800E3B6C
             g_SysWork.sysFlags       |= SysFlag_CutsceneActive;
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             func_8005E70C();
 
             D_800F4805++;
@@ -1283,7 +1283,7 @@ void func_800E3D18(void) // 0x800E3D18
             g_SysWork.sysFlags        |= SysFlag_CutsceneActive;
 
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             func_8005E70C();
             D_800F4805++;
 
@@ -2892,7 +2892,7 @@ void func_800E787C(void) // 0x800E787C
 
     if (g_SysWork.sysStateSteps[0] == 31)
     {
-        sharedFunc_800D08B8_0_s00(2, 127);
+        Particle_EnvironmentSet(2, 127);
     }
 
     if (g_SysWork.sysStateSteps[0] >= 31)
@@ -3286,7 +3286,7 @@ void func_800E86BC(void) // 0x800E86BC
 
     if (g_SysWork.sysStateSteps[0] == 8)
     {
-        sharedFunc_800D08B8_0_s00(2, 127);
+        Particle_EnvironmentSet(2, 127);
     }
 
     if (g_SysWork.sysStateSteps[0] >= 8)
@@ -3795,7 +3795,7 @@ void Map_WorldObjectsUpdate(void) // 0x800E972C
     {
         Math_SetSVectorFast(&g_WorldObject_Bin.rotation, D_800F482C, Q12_ANGLE(0.0f), Q12_ANGLE(0.0f));
         WorldObjects_Add(&g_WorldObject_Bin.object, &g_WorldObject_Bin.position, &g_WorldObject_Bin.rotation);
-        D_800F482C -= (FP_TO(g_DeltaTime, Q12_SHIFT) / Q12(3.6f));
+        D_800F482C -= Q12_DIV(g_DeltaTime, Q12(3.6f));
     }
 
     if (g_Cutscene_UpdateNu)
@@ -3952,7 +3952,7 @@ void func_800E9AC8(void) // 0x800E9AC8
 
 void func_800E9C28(void) // 0x800E9C28
 {
-    g_Screen_FadeStatus = ScreenFadeState_FadeOutComplete;
+    g_ScreenFade_Status = ScreenFadeState_FadeOutComplete;
 
     switch (g_SysWork.sysStateSteps[0])
     {

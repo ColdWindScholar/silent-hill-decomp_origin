@@ -20,20 +20,21 @@ bool Chara_Load(s32 modelIdx, s8 charaId, GsCOORDINATE2* boneCoords, s8 forceFre
 /** @brief Processes character model loads. */
 bool Chara_ProcessLoads(void);
 
-/** @brief Initializes a character's bone coords.
+/** @brief Initializes a character's animated bone coords.
  *
- * @param idx TODO: Character ID?
+ * @param modelAnimsIdx Index into `g_CharaModelAnimsData`.
  */
-void Chara_BonesInit(s32 idx);
+void Chara_BonesInit(s32 modelAnimsIdx);
 
-/** @brief Spawns a new character in the world.
+/** @brief Spawns a new NPC in the world.
  *
  * @param charaId ID of the character to spawn.
  * @param spawnFlags Spawn flags.
  * @param posX X spawn position.
  * @param posX Z spawn position.
- * @param rotY Y rotation.
+ * @param rotY Y spawn rotation.
  * @param stateStep Character model state step to set.
+ * @return @unused Spawned NPC slot index.
  */
 s32 Chara_Spawn(e_CharaId charaId, s32 spawnFlags, q19_12 posX, q19_12 posZ, q3_12 rotY, u32 stateStep);
 

@@ -225,7 +225,7 @@ void func_800EBA40(void) // 0x800EBA40
                         continue;
                     }
 
-                    Sd_PlaySfx(Sfx_Unk1586, Q8(0.0f), Q8(0.5f));
+                    Sd_SfxPlay(Sfx_Unk1586, Q8(0.0f), Q8(0.5f));
 
                     if (i < 11)
                     {
@@ -269,7 +269,7 @@ void func_800EBA40(void) // 0x800EBA40
             break;
 
         case 6:
-            Sd_PlaySfx(Sfx_Unk1587, Q8(0.0f), Q8(0.5f));
+            Sd_SfxPlay(Sfx_Unk1587, Q8(0.0f), Q8(0.5f));
             SysWork_StateStepIncrement(0);
 
         case 7:
@@ -282,7 +282,7 @@ void func_800EBA40(void) // 0x800EBA40
             Player_ControlUnfreeze(false);
             SysWork_StateSetNext(SysState_Gameplay);
             Event_ScreenFadeCmd(ScreenFadeCmd_Start, false, 0, Q12(0.0f), false);
-            func_80037154();
+            Game_RadioNoiseReset();
             break;
     }
 }
@@ -367,7 +367,7 @@ void func_800EBF70(void) // 0x800EBF70
                 }
 
                 Savegame_EventFlagSet(EventFlag_371);
-                Sd_PlaySfx(Sfx_Unk1588, Q8(0.0f), Q8(0.5f));
+                Sd_SfxPlay(Sfx_Unk1588, Q8(0.0f), Q8(0.5f));
             }
 
             SysWork_StateStepIncrement(0);
@@ -389,7 +389,7 @@ void func_800EBF70(void) // 0x800EBF70
             vcReturnPreAutoCamWork(true);
             Player_ControlUnfreeze(false);
             SysWork_StateSetNext(SysState_Gameplay);
-            func_80037154();
+            Game_RadioNoiseReset();
             break;
     }
 }
@@ -479,7 +479,7 @@ void func_800EC42C(void) // 0x800EC42C
             Event_ScreenFadeCmd(ScreenFadeCmd_Start, true, 3, 0, false);
             Dms_HeaderFixOffsets((s_DmsHeader* )FS_BUFFER_13);
             func_8003D03C();
-            sharedFunc_800D2EB4_0_s00();
+            Player_EmptyWeaponHandSet();
             Game_TurnFlashlightOn();
 
             D_800F035C = 0;
@@ -649,7 +649,7 @@ void func_800EC42C(void) // 0x800EC42C
             Savegame_EventFlagSet(EventFlag_458);
             Event_InvItemCmd(InvItemCmd_AddItem, InvItemId_ChannelingStone, 1, false);
             func_8003D01C();
-            sharedFunc_800D2EF4_0_s00();
+            Player_WeaponAttackRestore();
 
             g_Cutscene_Timer = NO_VALUE;
 
@@ -680,15 +680,15 @@ void Map_WorldObjectsInit(void) // 0x800ECB58
 
     if (g_SavegamePtr->gameDifficulty == GameDifficulty_Easy)
     {
-        g_SysWork.npcFlagsId = 3;
+        g_SysWork.npcFlagId = 3;
     }
     else if (g_SavegamePtr->gameDifficulty == GameDifficulty_Normal)
     {
-        g_SysWork.npcFlagsId = 4;
+        g_SysWork.npcFlagId = 4;
     }
     else
     {
-        g_SysWork.npcFlagsId = 5;
+        g_SysWork.npcFlagId = 5;
     }
 
     WorldObject_ModelNameSet(&g_CommonWorldObjects[0], g_CommonWorldObjectNames[2]);

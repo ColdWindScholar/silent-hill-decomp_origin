@@ -115,7 +115,7 @@ bool func_801E2ED8(void) // 0x801E2ED8
 
 bool func_801E2FC0(void) // 0x801E2FC0
 {
-    switch (g_Screen_FadeStatus)
+    switch (g_ScreenFade_Status)
     {
         case SCREEN_FADE_STATUS(ScreenFadeState_ResetTimestep,   false):
         case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, false):
@@ -164,18 +164,18 @@ bool func_801E3124(void) // 0x801E3124
     switch (g_GameWork.gameStateSteps[1])
     {
         case 0:
-            switch (g_Screen_FadeStatus)
+            switch (g_ScreenFade_Status)
             {
                 case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, true):
-                    g_GameWork.background2dColor.r = Q8_COLOR(1.0f);
-                    g_GameWork.background2dColor.g = Q8_COLOR(1.0f);
-                    g_GameWork.background2dColor.b = Q8_COLOR(1.0f);
+                    g_GameWork.background2dColor.r = 255;
+                    g_GameWork.background2dColor.g = 255;
+                    g_GameWork.background2dColor.b = 255;
                     break;
 
                 case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, false):
-                    g_GameWork.background2dColor.r = Q8_COLOR(0.0f);
-                    g_GameWork.background2dColor.g = Q8_COLOR(0.0f);
-                    g_GameWork.background2dColor.b = Q8_COLOR(0.0f);
+                    g_GameWork.background2dColor.r = 0;
+                    g_GameWork.background2dColor.g = 0;
+                    g_GameWork.background2dColor.b = 0;
                     break;
             }
 
@@ -189,14 +189,14 @@ bool func_801E3124(void) // 0x801E3124
             StoreImage(&g_CreditsVramSaveRects[1], (u_long*)IMAGE_BUFFER_1);
             DrawSync(SyncMode_Wait);
 
-            switch (g_Screen_FadeStatus)
+            switch (g_ScreenFade_Status)
             {
                 case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, true):
-                    Screen_RectInterlacedClear(0, 32, 512, 448, Q8_COLOR(1.0f), Q8_COLOR(1.0f), Q8_COLOR(1.0f));
+                    Screen_RectInterlacedClear(0, 32, 512, 448, 255, 255, 255);
                     break;
 
                 case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, false):
-                    Screen_RectInterlacedClear(0, 32, 512, 448, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+                    Screen_RectInterlacedClear(0, 32, 512, 448, 0, 0, 0);
                     break;
             }
 
@@ -249,7 +249,7 @@ bool func_801E3304(void) // 0x801E3304
         }
         else
         {
-            Screen_RectInterlacedClear(0, 32, 320, 448, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+            Screen_RectInterlacedClear(0, 32, 320, 448, 0, 0, 0);
             LoadImage(&g_CreditsVramSaveRects[0], IMAGE_BUFFER_0);
             LoadImage(&g_CreditsVramSaveRects[1], IMAGE_BUFFER_1);
             DrawSync(SyncMode_Wait);
@@ -291,7 +291,7 @@ bool func_801E342C(void) // 0x801E342C
     switch (g_GameWork.gameStateSteps[1])
     {
         case 0:
-            switch (g_Screen_FadeStatus)
+            switch (g_ScreenFade_Status)
             {
                 case SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, true):
                     ScreenFade_Start(true, true, true);
@@ -324,13 +324,13 @@ bool func_801E342C(void) // 0x801E342C
             D_801E5E78--;
             if (D_801E5E78 <= 0)
             {
-                g_Screen_FadeStatus          = g_GameWork.gameStateSteps[1];
+                g_ScreenFade_Status          = g_GameWork.gameStateSteps[1];
                 g_GameWork.gameStateSteps[1] = 3;
             }
             break;
 
         case 3:
-            if (g_Screen_FadeStatus == SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, false))
+            if (g_ScreenFade_Status == SCREEN_FADE_STATUS(ScreenFadeState_FadeOutComplete, false))
             {
                 g_GameWork.gameStateSteps[1] = 4;
                 return true;
@@ -665,7 +665,7 @@ bool func_801E3970(void) // 0x801E3970
              (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.skip))
     {
         skipTo = D_801E5E84 + 168;
-        skipTo = FP_TO(skipTo, Q12_SHIFT) / Q12(1.0f); // TODO: What math macro matches?
+        skipTo = Q12_DIV(skipTo, Q12(1.0f));
         D_800C48F0 = skipTo;
         SD_Call(19);
     }

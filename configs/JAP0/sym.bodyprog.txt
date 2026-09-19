@@ -183,16 +183,16 @@ D_8002B54C                                   = 0x8002B20C;
 //--- PA: 0x0097F0   VA: 0x8002E350   subsegment: c, memcard
 //----------------------------------------------------------
 MemCard_SysInit                              = 0x8002E350; // type:func
-MemCard_RamClear                             = 0x8002E404; // type:func
+MemCard_DeviceInfoClear                      = 0x8002E404; // type:func
 MemCard_FileStatusClear                      = 0x8002E450; // type:func
 MemCard_AreAllFilesUsed                      = 0x8002E48C; // type:func
 MemCard_SysEnable                            = 0x8002E4DC; // type:func
 MemCard_SysDisable                           = 0x8002E550; // type:func
 MemCard_InitStatus                           = 0x8002E57C; // type:func
-MemCard_StatusInitNotConnected               = 0x8002E58C; // type:func
+MemCard_InitStatusNotConnected               = 0x8002E58C; // type:func
 MemCard_AllMemCardsStatusGet                 = 0x8002E5B8; // type:func
 func_8002E8D4                                = 0x8002E5F4; // type:func
-MemCard_StatusInitSuccess                    = 0x8002E604; // type:func
+MemCard_InitStatusSuccess                    = 0x8002E604; // type:func
 func_8002E914                                = 0x8002E634; // type:func
 MemCard_ProcessSet                           = 0x8002E66C; // type:func
 MemCard_LastMemCardResultGet                 = 0x8002E6B0; // type:func
@@ -223,7 +223,7 @@ MemCard_DeviceTest                           = 0x8002FF70; // type:func
 MemCard_DeviceFormat                         = 0x8002FFF4; // type:func
 MemCard_FileClear                            = 0x8003001C; // type:func
 MemCard_FileRename                           = 0x80030058; // type:func
-MemCard_Init                                 = 0x800300CC; // type:func
+MemCard_WorkInit                             = 0x800300CC; // type:func
 MemCard_EventsInit                           = 0x800300FC; // type:func
 MemCard_StateInit                            = 0x8003012C; // type:func
 MemCard_SwEventsInit                         = 0x80030144; // type:func
@@ -305,12 +305,12 @@ GameFs_StreamBinSeek                         = 0x80032908; // type:func
 GameFs_StreamBinLoad                         = 0x80032928; // type:func
 GameFs_OptionBinLoad                         = 0x80032950; // type:func
 GameFs_SaveLoadBinLoad                       = 0x80032990; // type:func
-func_80032CE8                                = 0x800329D0; // type:func
+GameFs_LoadingTextDraw                       = 0x800329D0; // type:func
 
 //----------------------------------------------------------------
 //--- PA: 0x00DEA4   VA: 0x80032A04   subsegment: c, sys/game_main
 //----------------------------------------------------------------
-GameState_Boot_Update                        = 0x80032A04; // type:func
+GameState_Init_Update                        = 0x80032A04; // type:func
 MainLoop                                     = 0x80032BC8; // type:func
 
 //---------------------------------------------------------------------
@@ -417,7 +417,7 @@ func_80037124                                = 0x80036E58; // type:func
 //---------------------------------------------------------------
 //--- PA: 0x012328   VA: 0x80036E88   subsegment: c, events/radio
 //---------------------------------------------------------------
-func_80037154                                = 0x80036E88; // type:func
+Game_RadioNoiseReset                         = 0x80036E88; // type:func
 Game_RadioSoundStop                          = 0x80036EBC; // type:func
 
 //---------------------------------------------------------------------------
@@ -549,17 +549,17 @@ WorldGfx_PlayerModelProcessLoad              = 0x8003D66C; // type:func
 WorldGfx_CharaModelProcessAllLoads           = 0x8003D690; // type:func
 WorldGfx_CharaModelProcessLoad               = 0x8003D6FC; // type:func
 WorldGfx_CharaDraw                           = 0x8003D7D0; // type:func
-func_8003DD74                                = 0x8003DAA8; // type:func
-WorldGfx_HeldItemAttach                      = 0x8003DAB4; // type:func
-func_8003DE60                                = 0x8003DB94; // type:func
-func_8003DF84                                = 0x8003DCB8; // type:func
-func_8003E08C                                = 0x8003DDC0; // type:func
-func_8003E194                                = 0x8003DEC8; // type:func
-func_8003E238                                = 0x8003DF6C; // type:func
-func_8003E388                                = 0x8003E0BC; // type:func
-func_8003E414                                = 0x8003E148; // type:func
-func_8003E4A0                                = 0x8003E1D4; // type:func
-func_8003E544                                = 0x8003E278; // type:func
+WorldGfx_CharaClutYGet                       = 0x8003DAA8; // type:func
+WorldGfx_CharaMeshSwap                       = 0x8003DAB4; // type:func
+WorldGfx_HarryMeshSwap                       = 0x8003DB94; // type:func
+WorldGfx_CybilMeshSwap                       = 0x8003DCB8; // type:func
+WorldGfx_MonsterCybilMeshSwap                = 0x8003DDC0; // type:func
+WorldGfx_DahliaMeshSwap                      = 0x8003DEC8; // type:func
+WorldGfx_KaufmannMeshSwap                    = 0x8003DF6C; // type:func
+WorldGfx_StalkerMeshSwap                     = 0x8003E0BC; // type:func
+WorldGfx_SplitHeadMeshSwap                   = 0x8003E148; // type:func
+WorldGfx_PuppetNurseMeshSwap                 = 0x8003E1D4; // type:func
+WorldGfx_PuppetDoctorMeshSwap                = 0x8003E278; // type:func
 
 //------------------------------------------------------------------
 //--- PA: 0x0197BC   VA: 0x8003E31C   subsegment: c, gfx/map_effects
@@ -585,7 +585,7 @@ Gfx_FogParametersSet                         = 0x8003EDC0; // type:func
 Gfx_EffectsUpdate                            = 0x8003EEA4; // type:func
 func_8003F4DC                                = 0x8003F210; // type:func
 func_8003F654                                = 0x8003F388; // type:func
-Gfx_ProgressAlphaGet                         = 0x8003F424; // type:func
+func_8003F6F0                                = 0x8003F424; // type:func
 Math_WeightedAverageGet                      = 0x8003F518; // type:func
 func_8003F838                                = 0x8003F56C; // type:func
 func_8003FCB0                                = 0x8003F9E4; // type:func
@@ -717,27 +717,27 @@ func_80045534                                = 0x80045268; // type:func
 //----------------------------------------------------------------
 SD_Call                                      = 0x800457B0; // type:func
 Sd_AudioStreamingCheck                       = 0x8004585C; // type:func
-Sd_ChannelTaskGet                            = 0x800458FC; // type:func
+Sd_MidiChannelTaskGet                        = 0x800458FC; // type:func
 SD_BranchCTRL                                = 0x8004590C; // type:func
 Sd_AudioSystemSet                            = 0x80045A5C; // type:func
 SD_Init                                      = 0x80045B08; // type:func
-sd_work_init                                 = 0x80045B78; // type:func
+SD_InitStruct                                = 0x80045B78; // type:func
 Sd_AudioStop                                 = 0x80045D2C; // type:func
-Sd_PlaySfx                                   = 0x80045D7C; // type:func
+Sd_SfxPlay                                   = 0x80045D7C; // type:func
 Sd_SfxAttributesUpdate                       = 0x800460F4; // type:func
-func_80046620                                = 0x80046354; // type:func
+Sd_SfxWithPitchPlay                          = 0x80046354; // type:func
 Sd_LastSfxStop                               = 0x80046620; // type:func
 Sd_SfxStop                                   = 0x80046640; // type:func
 Sd_SfxStopStep                               = 0x80046660; // type:func
 Sd_AllSfxStop                                = 0x800466E0; // type:func
 Sd_AllSfxWithRRStop                          = 0x8004671C; // type:func
-func_80046A24                                = 0x80046758; // type:func
+Sd_SetupBgmMidiChannels                      = 0x80046758; // type:func
 func_80046A70                                = 0x800467A4; // type:func
-Sd_StopBgmTaskAdd                            = 0x8004680C; // type:func
-Sd_StopBgm                                   = 0x80046838; // type:func
-Sd_StopBgmStep                               = 0x800468AC; // type:func
-Sd_BgmChannelVolumeGet                       = 0x800468E8; // type:func
-Sd_ChannelsVolumeSet                         = 0x80046988; // type:func
+Sd_BgmStopTaskAdd                            = 0x8004680C; // type:func
+Sd_BgmStop                                   = 0x80046838; // type:func
+Sd_BgmStopStep                               = 0x800468AC; // type:func
+Sd_MidiChannelVolumeGet                      = 0x800468E8; // type:func
+Sd_MidiChannelsVolumeSet                     = 0x80046988; // type:func
 Sd_XaAudioPlayTaskAdd                        = 0x80046A70; // type:func
 Sd_XaAudioLengthGet                          = 0x80046B00; // type:func
 Sd_XaAudioPlay                               = 0x80046B34; // type:func
@@ -746,10 +746,10 @@ Sd_XaPreLoadAudioTaskAdd                     = 0x80046FF0; // type:func
 Sd_XaPreLoadAudio                            = 0x8004703C; // type:func
 Sd_XaAudioStopTaskAdd                        = 0x80047340; // type:func
 Sd_XaAudioStop                               = 0x80047368; // type:func
-Sd_SetVolume                                 = 0x800474CC; // type:func
-Sd_SetVolBgm                                 = 0x8004753C; // type:func
-Sd_SetVolXa                                  = 0x80047594; // type:func
-Sd_GetVolSe                                  = 0x800475EC; // type:func
+Sd_GlobalVolumeSet                           = 0x800474CC; // type:func
+Sd_BgmVolumeSet                              = 0x8004753C; // type:func
+Sd_XaVolumeSet                               = 0x80047594; // type:func
+Sd_SeVolumeGet                               = 0x800475EC; // type:func
 Sd_TaskPoolAdd                               = 0x80047610; // type:func
 Sd_TaskPoolUpdate                            = 0x800477A4; // type:func
 Sd_SetReverbDepth                            = 0x80047804; // type:func
@@ -819,16 +819,16 @@ vwOresenHokan                                = 0x8004A4FC; // type:func
 //--------------------------------------------------------------------
 //--- PA: 0x025A50   VA: 0x8004A5B0   subsegment: c, text/text_draw_jp
 //--------------------------------------------------------------------
-Gfx_StringSetPosition                        = 0x8004A5B0; // type:func
-Gfx_Strings2dLayerIdxSet                     = 0x8004A5F4; // type:func
-Gfx_StringsReset2dLayerIdx                   = 0x8004A600; // type:func
-Gfx_StringSetColor                           = 0x8004A610; // type:func
+Gfx_StringPositionSet                        = 0x8004A5B0; // type:func
+Gfx_StringLayerIdxSet                        = 0x8004A5F4; // type:func
+Gfx_StringLayerIdxReset                      = 0x8004A600; // type:func
+Gfx_StringColorSet                           = 0x8004A610; // type:func
 Gfx_StringDraw                               = 0x8004A61C; // type:func
 func_8004B76C                                = 0x8004AB04; // type:func
 Gfx_StringDrawInt                            = 0x8004AD90; // type:func
-Gfx_MapMsg_DefaultStringInfoSet              = 0x8004AEA8; // type:func
-Gfx_StringSetColor_JP                        = 0x8004AF50; // type:func
-Gfx_MapMsg_CalculateWidths                   = 0x8004AF5C; // type:func
+Gfx_MapMsg_Reset                             = 0x8004AEA8; // type:func
+Gfx_StringColorSet_JP                        = 0x8004AF50; // type:func
+Gfx_MapMsg_WidthsCompute                     = 0x8004AF5C; // type:func
 Gfx_MapMsg_StringDraw                        = 0x8004B6F4; // type:func
 Gfx_StringDraw_JP                            = 0x8004BFC0; // type:func
 
@@ -904,7 +904,7 @@ func_800549A0                                = 0x800563F4; // type:func
 func_80054A04                                = 0x80056458; // type:func
 Gfx_PickupItemAnimate                        = 0x8005652C; // type:func
 Inventory_AddSpecialItem                     = 0x80056700; // type:func
-Items_AmmoReloadCalculation                  = 0x80056A14; // type:func
+Items_AmmoReloadCompute                      = 0x80056A14; // type:func
 
 //------------------------------------------------------------------------
 //--- PA: 0x031F1C   VA: 0x80056A7C   subsegment: c, gfx/bodyprog_80055028
@@ -1082,7 +1082,7 @@ Collision_CollidableCharasGet                = 0x8006BBF8; // type:func
 Collision_OffsetCheck                        = 0x8006BE08; // type:func
 func_8006A42C                                = 0x8006BE80; // type:func
 func_8006A4A8                                = 0x8006BEFC; // type:func
-Collision_TargetCharaCollidingSlowDown       = 0x8006C394; // type:func
+Collision_MoveOffsetDampen                   = 0x8006C394; // type:func
 Collision_CollStateInit                      = 0x8006C5A4; // type:func
 Collision_MoveDirectionCalc                  = 0x8006C614; // type:func
 Collision_CharaCollisionHandle               = 0x8006C798; // type:func
@@ -1342,7 +1342,7 @@ Bgm_SongStopFadeOut                          = 0x80089B2C; // type:func
 //--- PA: 0x065094   VA: 0x80089BF4   subsegment: c, bodyprog_800881B8
 //--------------------------------------------------------------------
 Gfx_CursorDraw                               = 0x80089BF4; // type:func
-Map_BoxOutlineDraw                           = 0x80089DAC; // type:func
+PaperMap_ExpandingBoxesDraw                  = 0x80089DAC; // type:func
 
 //--------------------------------------------------------------
 //--- PA: 0x065B58   VA: 0x8008A6B8   subsegment: c, chara_spawn
@@ -2745,7 +2745,7 @@ g_Font16AtlasImg                             = 0x800AB390;
 g_KonamiLogoImg                              = 0x800AB398;
 // used by b_konami
 g_KcetLogoImg                                = 0x800AB3A0;
-D_800A900C                                   = 0x800AB3A8;
+g_MemCardWarningImg                          = 0x800AB3A8;
 g_TitleImg                                   = 0x800AB3B0;
 g_PaperMapImg                                = 0x800AB3B8;
 g_PaperMapMarkingAtlasImg                    = 0x800AB3C0;
@@ -2787,9 +2787,9 @@ fileStatuses                                 = 0x800ABB80;
 //--------------------------------------------------------------------------------------
 //--- PA: 0x087040   VA: 0x800ABBA0   subsegment: .data, game_boot/background_sound_init
 //--------------------------------------------------------------------------------------
-g_BgmTaskLoadCmds                            = 0x800ABBA0; // type:u16 size:0x54
-g_BgmChannelSetTaskCmds                      = 0x800ABBF4; // type:u16 size:0x54
-g_AmbientVabTaskLoadCmds                     = 0x800ABC48; // type:u16 size:0x50
+g_BgmTaskLoad                                = 0x800ABBA0; // type:u16 size:0x54
+g_BgmChannelSetTask                          = 0x800ABBF4; // type:u16 size:0x54
+g_AmbientVabTaskLoad                         = 0x800ABC48; // type:u16 size:0x50
 
 //------------------------------------------------------------------------------
 //--- PA: 0x087138   VA: 0x800ABC98   subsegment: .data, game_boot/fs_chara_anim
@@ -2812,7 +2812,7 @@ g_Bgm_ChannelLimits                          = 0x800ABD40;
 g_PaperMapFileIdxs                           = 0x800ABD50;
 g_PaperMapMarkingFileIdxs                    = 0x800ABD68;
 D_800A9A04                                   = 0x800ABDA0;
-D_800A9A0C                                   = 0x800ABDA8;
+g_IsLoadingFinished                          = 0x800ABDA8;
 g_MapEventSysState                           = 0x800ABDAC;
 g_MapEventParam                              = 0x800ABDB0;
 g_MapEventLastUsedItem                       = 0x800ABDB4;
@@ -2916,8 +2916,8 @@ g_Sd_KdtBuffer                               = 0x800AC374;
 D_800A9FDC                                   = 0x800AC378;
 g_AudioData                                  = 0x800AC388; // size:0x5F4
 g_Sd_ReverbDepths                            = 0x800AC97C;
-D_800AA604                                   = 0x800AC9A0;
-g_XaItemData                                 = 0x800ACC30;
+g_Sd_SongsChannelsForLayers                  = 0x800AC9A0;
+gSDXATable                                   = 0x800ACC30;
 g_Vab_InfoTable                              = 0x800AEE44;
 
 //-------------------------------------------------------------------
@@ -2930,7 +2930,7 @@ D_800AD480                                   = 0x800AF81C;
 //------------------------------------------------------------------------
 g_StringColorId                              = 0x800AF834;
 // text_draw
-g_Strings2dLayerIdx                          = 0x800AF838;
+g_StringLayerIdx                             = 0x800AF838;
 
 //---------------------------------------------------------------------------
 //--- PA: 0x08AD00   VA: 0x800AF860   subsegment: .data, items/item_screens_3
@@ -3240,15 +3240,17 @@ D_800B2610                                   = 0x800B4B40;
 //--- PA: 0x08FFE8   VA: 0x800B4B48   subsegment: .bss, memcard
 //-------------------------------------------------------------
 fileIdx.80                                   = 0x800B4B48;
-D_800B261C                                   = 0x800B4B4C;
-checkSumValidationAttempts                   = 0x800B4B50;
-directoryInfoCpy                             = 0x800B4B58;
+readDataErrorAttempt.00                      = 0x800B4B4C;
+checkSumValidationAttempts.00                = 0x800B4B50;
+D_800B2624.00                                = 0x800B4B54;
+directoryInfoCpy.00                          = 0x800B4B58;
 fileIdx.89                                   = 0x800B4CA4;
-fileIdxCpy                                   = 0x800B4CA8;
-g_MemCard_BasicSaveInfo1                     = 0x800B4CB0;
-g_MemCard_BasicSaveInfo2                     = 0x800B5BB0;
-g_MemCard_BasicSaveInfo3                     = 0x800B6AB0;
-g_MemCard_AvailibityStatus                   = 0x800B79B0;
+fileIdxCpy.00                                = 0x800B4CA8;
+D_800B277C.00                                = 0x800B4CAC;
+g_MemCard_SaveHeaderInfo_Slot1               = 0x800B4CB0;
+g_MemCard_SaveHeaderInfo_Slot2               = 0x800B5BB0;
+g_MemCard_SaveHeaderInfo_Null                = 0x800B6AB0;
+g_MemCard_SysAvailibityStatus                = 0x800B79B0; // size:0x4
 g_MemCard_Work                               = 0x800B79B8;
 g_MemCard_SaveWork                           = 0x800B7A38;
 
@@ -3282,7 +3284,7 @@ vcWork                                       = 0x800BC200;
 g_ActiveBufferIdx                            = 0x800BC4E8;
 g_SysWork                                    = 0x800BC4F0; // type:SysWork size:0x2768
 g_GameWork                                   = 0x800BEC58; // type:GameWork size:0x5D8
-g_Screen_FadeStatus                          = 0x800BF23C;
+g_ScreenFade_Status                          = 0x800BF23C;
 
 //-------------------------------------------------------------------
 //--- PA: 0x09A6E8   VA: 0x800BF248   subsegment: .bss, sys/memcard_2
@@ -3316,7 +3318,7 @@ g_Bgm_LayersUpdated                          = 0x800BF28C;
 //--- PA: 0x09A730   VA: 0x800BF290   subsegment: .bss, events/map_msg_display
 //----------------------------------------------------------------------------
 g_MapMsg_Select                              = 0x800BF2A8; // size:2
-g_MapMsg_AudioLoadBlock                      = 0x800BF2AA;
+g_MapMsg_AudioType                           = 0x800BF2AA;
 g_MapMsg_SelectCancelIdx                     = 0x800BF2AB;
 
 //----------------------------------------------------------------------------
@@ -3324,10 +3326,10 @@ g_MapMsg_SelectCancelIdx                     = 0x800BF2AB;
 //----------------------------------------------------------------------------
 g_DeltaTimeCpy                               = 0x800BF2B4;
 g_ItemTriggerEvents                          = 0x800BF2C0;
-g_RadioNpcInfos                              = 0x800BF2D8;
-D_800BCDB0                                   = 0x800BF2E0;
+g_RadioNoise                                 = 0x800BF2D8;
+g_MapPoint                                   = 0x800BF2E0;
 g_ItemTriggerItemIds                         = 0x800BF2F0;
-D_800BCDD4                                   = 0x800BF304;
+g_MapAreaLoadCounter                         = 0x800BF304;
 g_MapEventData                               = 0x800BF308;
 
 //------------------------------------------------------------------
@@ -3378,8 +3380,8 @@ D_800C15D4                                   = 0x800C3B04;
 D_800C15D8                                   = 0x800C3B08;
 D_800C15DC                                   = 0x800C3B0C;
 D_800C15E0                                   = 0x800C3B10;
-XaCdLocation                                 = 0x800C3B18;
-D_800C15F0                                   = 0x800C3B20;
+g_Sd_XaCdLocation                            = 0x800C3B18;
+g_Sd_XaCdlInfo                               = 0x800C3B20;
 g_AudioPlayingIdxList                        = 0x800C3B28; // type:u16 size:0x30
 g_AudioPlayingPitchList                      = 0x800C3B58; // type:s16 size:0x30
 g_Sd_AudioWork                               = 0x800C3B88;
@@ -3392,13 +3394,13 @@ D_800C166E                                   = 0x800C3B9E;
 D_800C166F                                   = 0x800C3B9F;
 g_Sd_AudioStreamingStates                    = 0x800C3BA0;
 gSDVolConfig                                 = 0x800C3BA8;
-D_800C1688                                   = 0x800C3BB8;
+g_Sd_XaAudioPlayTracking                     = 0x800C3BB8;
 g_Sd_VabPlayingInfo                          = 0x800C3BC8;
 g_Sd_TaskPool                                = 0x800C3BD8;
 D_800C16C8                                   = 0x800C3BF8;
 g_Sd_AudioType                               = 0x800C5CF8;
-g_Sd_DataMoved                               = 0x800C5CFC;
-g_Sd_VabLoadAttemps                          = 0x800C5D00;
+g_Sd_FileDataTransferred                     = 0x800C5CFC;
+g_Sd_DataLoadAttempts                        = 0x800C5D00;
 g_Sd_VabTargetLoad                           = 0x800C5D04;
 g_Sd_KdtTargetLoad                           = 0x800C5D08;
 g_Sd_XaTaskPending                           = 0x800C5D0C;
@@ -3426,10 +3428,10 @@ g_StringPositionX1                           = 0x800C5DDC;
 //--- PA: 0x0A1280   VA: 0x800C5DE0   subsegment: bss
 //---------------------------------------------------
 g_MapMsg_GlyphSprite                         = 0x800C5DE8;
-D_800C391C                                   = 0x800C5E0C;
+g_GlyphSpritePositionX                       = 0x800C5E0C;
 D_800C391E                                   = 0x800C5E0E;
 D_800C5E10                                   = 0x800C5E10; // size:4
-D_800C38B0                                   = 0x800C5E18;
+g_MapMsg_ActiveLine                          = 0x800C5E18;
 D_800C3920                                   = 0x800C5E54;
 
 //----------------------------------------------------------------------------
@@ -3493,7 +3495,7 @@ g_Items_Coords                               = 0x800C6378;
 //--- PA: 0x0A1B38   VA: 0x800C6698   subsegment: bss
 //---------------------------------------------------
 g_WorldEnvWork                               = 0x800C6698;
-D_800C42B8                                   = 0x800C67E8;
+g_ViewCoord                                  = 0x800C67E8;
 
 //---------------------------------------------------------------
 //--- PA: 0x0A1C90   VA: 0x800C67F0   subsegment: .bss, sound/sfx
@@ -3548,9 +3550,9 @@ D_800C44D0                                   = 0x800C6A00;
 D_800C44D4                                   = 0x800C6A04;
 attackPos                                    = 0x800C6A10;
 D_800C44F0                                   = 0x800C6A20;
-g_TargetEnemyPosition                        = 0x800C6A70;
+g_Player_TargetEnemyPosition                 = 0x800C6A70;
 D_800C454C                                   = 0x800C6A7C;
-D_800C4550                                   = 0x800C6A80;
+g_Player_PrevMoveSpeed                       = 0x800C6A80;
 D_800C4554                                   = 0x800C6A84;
 D_800C4556                                   = 0x800C6A86;
 g_Player_HasMoveInput                        = 0x800C6A88;
@@ -3559,7 +3561,7 @@ g_Player_PrevAttackReceived                  = 0x800C6A90;
 g_Player_IsDead                              = 0x800C6A91;
 g_Player_DisableDamage                       = 0x800C6A92;
 g_Player_EquippedWeaponInfo                  = 0x800C6AA0;
-D_800C457C                                   = 0x800C6AAC;
+g_Player_CutsceneState                       = 0x800C6AAC;
 g_Player_IsAiming                            = 0x800C6AAE;
 g_Player_IsSteppingLeftTap                   = 0x800C6AB0;
 g_Player_IsSteppingRightTap                  = 0x800C6AB2;

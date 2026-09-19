@@ -48,8 +48,8 @@ void GameFs_SaveLoadBinLoad(void) // 0x80032CA8
     Fs_QueueStartRead(FILE_VIN_SAVELOAD_BIN, FS_BUFFER_1);
 }
 
-void func_80032CE8(void) // 0x80032CE8
+void GameFs_LoadingTextDraw(void) // 0x80032CE8
 {
-    Gfx_StringSetPosition(SCREEN_POSITION_X(33.75f), SCREEN_POSITION_Y(43.5f));
-    Gfx_StringDraw("\x7Now_loading.", 100);
+    Gfx_StringPositionSet(108, 104);
+    Gfx_StringDraw("\7Now_loading.", 100);
 }

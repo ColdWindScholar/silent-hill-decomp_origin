@@ -180,11 +180,10 @@ void Event_Update(bool disableButtonEvents) // 0x800373CC
         // `TriggerActivationType_Button`: Only allow button activated events when area is lit up?
         if (mapEvent->activationType == TriggerActivationType_Button)
         {
-            if ((g_SysWork.field_2388.field_154.effectsInfo.field_0.s_field_0.field_0 & 2) && !g_SysWork.field_2388.isFlashlightOn &&
-                ((g_SysWork.field_2388.field_1C[0].effectsInfo.field_0.s_field_0.field_0 & 1) || (g_SysWork.field_2388.field_1C[1].effectsInfo.field_0.s_field_0.field_0 & 1)))
+            if ((g_SysWork.field_2388.field_154.effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_FlashlightAllowed) && !g_SysWork.field_2388.isFlashlightOn &&
+                ((g_SysWork.field_2388.field_1C[0].effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment) || (g_SysWork.field_2388.field_1C[1].effectsInfo.flags.field_00[0] & SpecialEnvEventFlags_DarkEnvironment)))
             {
-                if (mapEvent->sysState != SysState_LoadOverlay &&
-                    (mapEvent->sysState != SysState_LoadRoom && mapEvent->eventParam > 1))
+                if (mapEvent->sysState != SysState_LoadOverlay && (mapEvent->sysState != SysState_LoadRoom && mapEvent->eventParam > 1))
                 {
                     continue;
                 }
@@ -226,8 +225,8 @@ bool Event_CollideFacingCheck(s_MapPoint2d* mapPoint) // 0x800378D4
     if (g_TickCount > D_800A9A20)
     {
         rotY       = g_SysWork.playerWork.player.rotation.vy;
-        D_800A9A24 = g_SysWork.playerWork.player.position.vx - (Math_Sin(rotY) >> 3); // `/ 8`.
-        D_800A9A28 = g_SysWork.playerWork.player.position.vz - (Math_Cos(rotY) >> 3); // `/ 8`.
+        D_800A9A24 = g_SysWork.playerWork.player.position.vx - DIV_FAST(Math_Sin(rotY), 8);
+        D_800A9A28 = g_SysWork.playerWork.player.position.vz - DIV_FAST(Math_Cos(rotY), 8);
         D_800A9A20 = g_TickCount;
     }
 
@@ -280,12 +279,12 @@ bool Event_CollideObbFacingCheck(s_MapPoint2d* mapPoint) // 0x80037A4C
     s32    scaledSinPlayerRotY;
     s32    scaledCosRotY;
 
-    halfSinRotY   = Math_Sin(g_SysWork.playerWork.player.rotation.vy) >> 1; // `/ 2`.
+    halfSinRotY   = DIV_FAST(Math_Sin(g_SysWork.playerWork.player.rotation.vy), 2);
     scaledCosRotY = -Math_Cos(Q12_ANGLE_FROM_Q8(mapPoint->triggerParam0)) * mapPoint->triggerParam1;
 
     clampedHalfCosPlayerRotY = halfSinRotY;
 
-    temp_a0_2 = scaledCosRotY >> 4; // `/ 16`.
+    temp_a0_2 = DIV_FAST(scaledCosRotY, 16);
     deltaX    = mapPoint->positionX - g_SysWork.playerWork.player.position.vx;
     temp_s2   = deltaX - temp_a0_2;
     temp_s4   = deltaX + temp_a0_2;
@@ -305,13 +304,13 @@ bool Event_CollideObbFacingCheck(s_MapPoint2d* mapPoint) // 0x80037A4C
     {
         if (MIN(halfSinRotY, 0) <= MAX(temp_s2, temp_s4))
         {
-            halfCosPlayerRotY   = Math_Cos(g_SysWork.playerWork.player.rotation.vy) >> 1; // `/ 2`.
+            halfCosPlayerRotY   = DIV_FAST(Math_Cos(g_SysWork.playerWork.player.rotation.vy), 2);
             scaledSinPlayerRotY = Math_Sin(Q12_ANGLE_FROM_Q8(mapPoint->triggerParam0)) *
                                   mapPoint->triggerParam1;
 
             clampedHalfCosPlayerRotY = halfCosPlayerRotY;
 
-            temp_a0_2 = scaledSinPlayerRotY >> 4; // `/ 16`.
+            temp_a0_2 = DIV_FAST(scaledSinPlayerRotY, 16);
             deltaZ    = mapPoint->positionZ - g_SysWork.playerWork.player.position.vz;
             temp_v1   = deltaZ - temp_a0_2;
             temp_a2   = deltaZ + temp_a0_2;

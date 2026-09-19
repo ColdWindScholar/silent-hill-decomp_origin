@@ -40,12 +40,12 @@ typedef enum _CharaGroupFlags
 /** @brief Character collision states. */
 typedef enum _CharaCollisionState
 {
-    CharaCollisionState_Ignore = 0,
-    CharaCollisionState_Player = 1,
-    CharaCollisionState_2      = 2,
-    CharaCollisionState_Npc    = 3,
-    CharaCollisionState_4      = 4,
-    CharaCollisionState_5      = 5
+    CharaCollisionState_Ignore  = 0,
+    CharaCollisionState_Player  = 1,
+    CharaCollisionState_2       = 2,
+    CharaCollisionState_Npc     = 3,
+    CharaCollisionState_4       = 4,
+    CharaCollisionState_Default = 5
 } e_CharaCollisionState;
 
 /** @brief Character IDs.
@@ -160,7 +160,7 @@ typedef struct _PropsPlayer
     /* 0x104 */ q19_12        field_104;    // Distance?
     /* 0x108 */ q19_12        runDistance;
     /* 0x10C */ u8            field_10C;    // Player SFX pitch?
-    /* 0x10D */ u8            field_10D;
+    /* 0x10D */ u8            field_10D;    // @unused? Set to 0 or 1.
     /* 0x10E */ s8            __pad_10E[2];
     /* 0x110 */ q19_12        timer_110; // Increases when `flags & CharaFlag_Unk4` is set, reset when reaches `D_800C45EC`.
     /* 0x114 */ q19_12        gasWeaponPowerTimer; // Timer for the rock drill and chainsaw power.
@@ -182,7 +182,7 @@ typedef struct
     /* 0x8  */ s32         field_8;
     /* 0xC  */ s32         field_C;
     /* 0x10 */ s8          unk_10[8];
-    /* 0x18 */ s32         field_18;
+    /* 0x18 */ q19_12      field_18; // Angle?
     /* 0x1C */ s32         idx_1C;
     /* 0x20 */ s32         field_20;
     /* 0x24 */ s_AnimInfo* animInfo_24;
@@ -198,7 +198,7 @@ typedef struct _PropsNpc
 {
     /* 0xE8  */ s32    controlState; /** `e_*Control` */
     /* 0xEC  */ s16    field_EC;
-    /* 0xEE  */ s16    field_EE; // Anim index?
+    /* 0xEE  */ s16    field_EE; // Anim index (or full anim status?) in MonsterCybil.
     /* 0xF0  */ s32    freeze; // `bool`, `q19_12` timer in MonsterCybil.
     /* 0xF4  */ s32    field_F4;
     /* 0xF8  */ s32    resetControlState; // `bool`, `q19_12` timer in MonsterCybil.
@@ -235,9 +235,9 @@ typedef struct _PropsAirScreamer
     /* 0xF0    */ s16     field_F0; // } Maybe 2D offset like in Creeper properties? Must check.
     /* 0xF2    */ s16     field_F2; // }
     /* 0xF4    */ s32     field_F4;
-    /* 0xF8    */ VECTOR3 targetPosition; /** Q19.12 */
-    /* 0x104   */ VECTOR3 position_104;   /** Q19.12 | Set to either Air Screamer position with slight offset toward player or player position. */
-    /* 0x110   */ VECTOR3 position_110;
+    /* 0xF8    */ VECTOR3 targetPosition;     /** Q19.12 */
+    /* 0x104   */ VECTOR3 headTargetPosition; /** Q19.12 */
+    /* 0x110   */ VECTOR3 targetPosition2;    /** Q19.12 | TODO: Unknown purpose. */
     /* 0x11C   */ s32     flags; /** `e_AirScreamerFlags` */
     /* 0x120   */ q19_12  timer_120;
     /* 0x124   */ q19_12  groundHeight;
@@ -453,7 +453,7 @@ typedef struct _PropsSplitHead
     /* 0xF2  */ q4_12   timer_F2;
     /* 0xF4  */ q4_12   timer_F4;
     /* 0xF8  */ s8      __pad_F8[2];
-    /* 0xF8  */ q19_12  animTime_F8;
+    /* 0xF8  */ q19_12  animTime; // Set to `Q12(201.0f)` if not walking forward.
     /* 0xFC  */ s32     field_FC;
     /* 0x100 */ s32     field_100;
     /* 0x104 */ s8      unk_104[4];
@@ -727,7 +727,7 @@ extern s_CharaFileInfo CHARA_FILE_INFOS[Chara_Count]; // 0x800A90FC
  * @note This is only for NPCs which use the `s_PropsNpc` part of the `s_SubCharacter::properties` union.
  *
  * @param chara Character to update.
- * @param anmHdr ANM file header.
+ * @param anmHdr Character animation data.
  * @param boneCoords Character model bone coords.
  * @param animInfos Character animation infos.
  */

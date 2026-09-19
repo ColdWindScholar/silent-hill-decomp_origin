@@ -156,7 +156,7 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
         case DahliaControl_6:
             Model_AnimStatusSet(&dahlia->model, DahliaAnim_14, false);
 #if defined(MAP7_S03)
-            WorldGfx_HeldItemAttach(Chara_EndingDahlia, MODEL_BONE(1, 0));
+            WorldGfx_CharaMeshSwap(Chara_EndingDahlia, MESH_SWAP_STATUS(0, 1));
 #endif
             Chara_AnimStateReset(dahlia);
             break;
@@ -186,15 +186,15 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
 
             if (dahlia->model.anim.keyframeIdx < 144)
             {
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(1, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_1));
             }
             else
             {
 #if !defined(MAP6_S01) && !defined(MAP6_S04) && !defined(MAP7_S02) && !defined(MAP7_S03)
 #if defined(MAP3_S06)
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(2, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_2));
 #else
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(3, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_3));
 #endif
 #endif
             }
@@ -214,15 +214,15 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
             {
 #if !defined(MAP6_S01) && !defined(MAP6_S04) && !defined(MAP7_S02) && !defined(MAP7_S03)
 #if defined(MAP3_S06)
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(2, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_2));
 #else
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(3, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_3));
 #endif
 #endif
             }
             else
             {
-                WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(1, 0));
+                WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_1));
             }
             break;
 
@@ -310,7 +310,7 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
 
         case DahliaControl_25:
             Model_AnimStatusSet(&dahlia->model, DahliaAnim_11, false);
-            WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(1, 0));
+            WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_1));
 
             if (dahlia->model.anim.keyframeIdx == 349)
             {
@@ -348,25 +348,25 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
     switch (dahliaProps.controlState)
     {
         case DahliaControl_1:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(DahliaAnim_2, true), dahlia, 24, 37, sfxId, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(DahliaAnim_2, true), dahlia, 24, 37, sfxId, pitch0);
             break;
 
         case DahliaControl_8:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(DahliaAnim_4, true), dahlia, 107, 98, sfxId, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(DahliaAnim_4, true), dahlia, 107, 98, sfxId, pitch0);
             break;
 
         case DahliaControl_11:
-            sharedFunc_800D908C_0_s00(ANIM_STATUS(DahliaAnim_7, true), dahlia, 235, 245, sfxId, pitch0);
+            Npc_FootstepSoundPlay(ANIM_STATUS(DahliaAnim_7, true), dahlia, 235, 245, sfxId, pitch0);
             break;
 
         case DahliaControl_7:
             if (dahlia->model.anim.keyframeIdx < 47)
             {
-                sharedFunc_800D9188_0_s00(dahlia->model.anim.status, dahlia, 46, Sfx_Unk1674);
+                Npc_SfxPlay(dahlia->model.anim.status, dahlia, 46, Sfx_Unk1674);
             }
             else
             {
-                sharedFunc_800D9188_0_s00(dahlia->model.anim.status, dahlia, 47, Sfx_Unk1675);
+                Npc_SfxPlay(dahlia->model.anim.status, dahlia, 47, Sfx_Unk1675);
             }
             break;
 
@@ -376,33 +376,33 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
         case DahliaControl_17:
             if (dahlia->model.anim.keyframeIdx < 127)
             {
-                sharedFunc_800D9188_0_s00(ANIM_STATUS(DahliaAnim_17, true), dahlia, 120, Sfx_Unk1674);
+                Npc_SfxPlay(ANIM_STATUS(DahliaAnim_17, true), dahlia, 120, Sfx_Unk1674);
             }
             else
             {
-                sharedFunc_800D9188_0_s00(ANIM_STATUS(DahliaAnim_17, true), dahlia, 127, Sfx_Unk1675);
+                Npc_SfxPlay(ANIM_STATUS(DahliaAnim_17, true), dahlia, 127, Sfx_Unk1675);
             }
             break;
 
         case DahliaControl_10:
             if (g_SavegamePtr->mapIdx == MapIdx_MAP2_S01)
             {
-                sharedFunc_800D9188_0_s00(dahlia->model.anim.status, dahlia, 193, Sfx_Unk1488);
+                Npc_SfxPlay(dahlia->model.anim.status, dahlia, 193, Sfx_Unk1488);
             }
             else
             {
-                sharedFunc_800D9188_0_s00(dahlia->model.anim.status, dahlia, 193, Sfx_Unk1496);
+                Npc_SfxPlay(dahlia->model.anim.status, dahlia, 193, Sfx_Unk1496);
             }
             break;
 
         case DahliaControl_14:
             if (dahlia->model.anim.keyframeIdx < 310)
             {
-                sharedFunc_800D908C_0_s00(dahlia->model.anim.status, dahlia, 319, 309, sfxId, pitch0);
+                Npc_FootstepSoundPlay(dahlia->model.anim.status, dahlia, 319, 309, sfxId, pitch0);
             }
             else
             {
-                sharedFunc_800D908C_0_s00(dahlia->model.anim.status, dahlia, 319, 329, sfxId, pitch0);
+                Npc_FootstepSoundPlay(dahlia->model.anim.status, dahlia, 319, 329, sfxId, pitch0);
             }
             break;
 
@@ -410,11 +410,11 @@ void Dahlia_ControlUpdate(s_SubCharacter* dahlia, GsCOORDINATE2* boneCoords)
             if (dahlia->model.anim.keyframeIdx < 175)
             {
 
-                sharedFunc_800D9188_0_s00(ANIM_STATUS(DahliaAnim_19, true), dahlia, 170, Sfx_Unk1674);
+                Npc_SfxPlay(ANIM_STATUS(DahliaAnim_19, true), dahlia, 170, Sfx_Unk1674);
             }
             else
             {
-                sharedFunc_800D9188_0_s00(ANIM_STATUS(DahliaAnim_19, true), dahlia, 177, Sfx_Unk1675);
+                Npc_SfxPlay(ANIM_STATUS(DahliaAnim_19, true), dahlia, 177, Sfx_Unk1675);
             }
             break;
     }
@@ -444,9 +444,9 @@ void Dahlia_Init(s_SubCharacter* dahlia)
     sharedData_800D16E4_2_s01 = 0;
 
 #ifdef MAP7_S03
-    WorldGfx_HeldItemAttach(Chara_EndingDahlia, MODEL_BONE(1, 0)); // TODO: MAP7_S03 Dahlia funcs could be EndingDahlia instead, if other Dahlia funcs don't match other overlays.
+    WorldGfx_CharaMeshSwap(Chara_EndingDahlia, MESH_SWAP_STATUS(0, 1)); // TODO: MAP7_S03 Dahlia funcs could be EndingDahlia instead, if other Dahlia funcs don't match other overlays.
 #else
-    WorldGfx_HeldItemAttach(Chara_Dahlia, MODEL_BONE(1, 0));
+    WorldGfx_CharaMeshSwap(Chara_Dahlia, MESH_SWAP_STATUS(DahliaSwappableMesh_Head, DahliaVariantMesh_1));
 #endif
 
 #ifdef MAP7_S02

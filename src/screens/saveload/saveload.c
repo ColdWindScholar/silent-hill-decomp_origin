@@ -268,11 +268,11 @@ void SaveScreen_SlotStrAndBottomRectDraw(void) // 0x801E2EBC
         "SLOT2"
     };
 
-    Gfx_StringSetColor(StringColorId_White);
+    Gfx_StringColorSet(StringColorId_White);
 
     for (i = 0; i < MEMCARD_SLOT_COUNT_MAX; i++)
     {
-        Gfx_StringSetPosition(SLOT_STR_POS_TABLE[i].vx, SLOT_STR_POS_TABLE[i].vy);
+        Gfx_StringPositionSet(SLOT_STR_POS_TABLE[i].vx, SLOT_STR_POS_TABLE[i].vy);
         Gfx_StringDraw(SLOT_STRS[i], 50);
     }
 
@@ -290,23 +290,23 @@ void SaveScreen_SelectedElementIdxUpdate(s32 slotIdx, s32 unused) // 0x801E2F90
 
 void SaveScreen_FileIdxDraw(s32 saveIdx, s32 slotIdx, s32 fileId, s32 entryType) // 0x801E2FCC
 {
-    #define OFFSET_X             SCREEN_POSITION_X(47.0f)
-    #define FILE_STR_MARGIN_X    SCREEN_POSITION_X(10.0f)
-    #define FILE_ID_STR_MARGIN_X FILE_STR_MARGIN_X + SCREEN_POSITION_X(15.75f)
-    #define POS_Y                SCREEN_POSITION_Y(14.75f)
+    #define OFFSET_X             150
+    #define FILE_STR_MARGIN_X    (SCREEN_WIDTH / 10)
+    #define FILE_ID_STR_MARGIN_X (FILE_STR_MARGIN_X + 50)
+    #define POS_Y                35
 
     const char* FILE_STR = "FILE";
 
     if (saveIdx == g_SlotElementSelectedIdx[slotIdx] && entryType >= SavegameEntryType_OutOfBlocks)
     {
-        Gfx_StringSetColor(StringColorId_White);
+        Gfx_StringColorSet(StringColorId_White);
 
         // Draw "FILE" string.
-        Gfx_StringSetPosition((slotIdx * OFFSET_X) + FILE_STR_MARGIN_X, POS_Y);
+        Gfx_StringPositionSet((slotIdx * OFFSET_X) + FILE_STR_MARGIN_X, POS_Y);
         Gfx_StringDraw(FILE_STR, 50);
 
         // Draw file ID string.
-        Gfx_StringSetPosition((slotIdx * OFFSET_X) + FILE_ID_STR_MARGIN_X, POS_Y);
+        Gfx_StringPositionSet((slotIdx * OFFSET_X) + FILE_ID_STR_MARGIN_X, POS_Y);
         Gfx_StringDrawInt(1, fileId);
     }
 
@@ -320,30 +320,30 @@ bool SaveScreen_NextFearModeSave(s_MemCard_SaveMetadata* saveEntry) // 0x801E307
 {
     if (saveEntry != NULL && saveEntry->isNextFearMode)
     {
-        Gfx_StringSetColor(StringColorId_Gold);
+        Gfx_StringColorSet(StringColorId_Gold);
         return true;
     }
 
-    Gfx_StringSetColor(StringColorId_White);
+    Gfx_StringColorSet(StringColorId_White);
     return false;
 }
 
 void SaveScreen_SaveLocationDraw(s_SaveScreenElement* saveEntry, s32 saveIdx, s32 slotIdx) // 0x801E30C4
 {
-    #define OFFSET_X SCREEN_POSITION_X(47.0f)
-    #define MARGIN_X SCREEN_POSITION_X(28.25f)
-    #define OFFSET_Y SCREEN_POSITION_Y(8.5f)
-    #define MARGIN_Y SCREEN_POSITION_Y(22.25f)
+    #define OFFSET_X 150
+    #define MARGIN_X 90
+    #define OFFSET_Y (SCREEN_HEIGHT / 12)
+    #define MARGIN_Y 53
 
     s32 nameIdx = saveEntry->locationId;
 
     const u8 X_OFFSETS[] = {
-        82, 37, 30, 44,
-        81, 81, 61, 61,
-        59, 51, 84, 81,
+        82, 37,  30, 44,
+        81, 81,  61, 61,
+        59, 51,  84, 81,
         81, 109, 75, 111,
-        97, 38, 55, 45,
-        95, 48, 71, 102,
+        97, 38,  55, 45,
+        95, 48,  71, 102,
         77
     };
 
@@ -369,10 +369,10 @@ void SaveScreen_SaveLocationDraw(s_SaveScreenElement* saveEntry, s32 saveIdx, s3
             {
                 colorId = StringColorId_White;
             }
-            Gfx_StringSetColor(colorId);
+            Gfx_StringColorSet(colorId);
         }
 
-        Gfx_StringSetPosition(((slotIdx * OFFSET_X) + MARGIN_X) - (X_OFFSETS[nameIdx] / 2),
+        Gfx_StringPositionSet(((slotIdx * OFFSET_X) + MARGIN_X) - (X_OFFSETS[nameIdx] / 2),
                               (selectedSaveIdx * OFFSET_Y) + MARGIN_Y);
         Gfx_StringDraw(g_Savegame_SaveLocationNames[nameIdx], 50);
     }
@@ -406,17 +406,17 @@ void SaveScreen_SaveBorder(s_SaveScreenElement* saveEntry, s_SaveScreenElement* 
 void SaveScreen_SavesSlotDraw(s_SaveScreenElement* saveEntry, s32 saveIdx, s32 slotIdx) // 0x801E3304
 {
     const char* DIALOG_STRS[11] = {
-        "\x07MEMORY_CARD\nis_not_inserted",
-        "\x07MEMORY_CARD\nis_\x01not_\x01""formatted",
-        "\x07MEMORY_CARD\nmay_be_broken",
-        "\x07Now_checking\nMEMORY_CARD",
-        "\x07Out_of_blocks",
-        "\x07No_data_file",
-        "\x07No_data_file",
-        "\x07____Fil""\x01""e_\x01\x01is_\x01\x01""da\x01ma\x01g\x01""ed",
-        "\x07",
-        "\x07________\x01New_save",
-        "\x07____Crea\x01t\x01""e_\x01n\x01""e\x01w_\x01""fi\x01le"
+        "\7MEMORY_CARD\nis_not_inserted",
+        "\7MEMORY_CARD\nis_\x01not_\x01""formatted",
+        "\7MEMORY_CARD\nmay_be_broken",
+        "\7Now_checking\nMEMORY_CARD",
+        "\7Out_of_blocks",
+        "\7No_data_file",
+        "\7No_data_file",
+        "\7____Fil""\x01""e_\x01\x01is_\x01\x01""da\x01ma\x01g\x01""ed",
+        "\7",
+        "\7________\x01New_save",
+        "\7____Crea\x01t\x01""e_\x01n\x01""e\x01w_\x01""fi\x01le"
     };
 
     s32 i;
@@ -530,7 +530,7 @@ void SaveScreen_SavesSlotDraw(s_SaveScreenElement* saveEntry, s32 saveIdx, s32 s
     }
 
     D_801E7514[slotIdx] = true;
-    Gfx_StringSetColor(StringColorId_White);
+    Gfx_StringColorSet(StringColorId_White);
 
     // Draw memory card message string.
     switch (entryType)
@@ -539,20 +539,20 @@ void SaveScreen_SavesSlotDraw(s_SaveScreenElement* saveEntry, s32 saveIdx, s32 s
         case SavegameEntryType_UnformattedMemCard:
         case SavegameEntryType_CorruptedMemCard:
         case SavegameEntryType_LoadMemCard:
-            Gfx_StringSetPosition((slotIdx * SLOT_COLUMN_OFFSET) + 22, 82);
+            Gfx_StringPositionSet((slotIdx * SLOT_COLUMN_OFFSET) + 22, 82);
             break;
 
         case SavegameEntryType_NoDataInMemCard:
         case SavegameEntryType_Unk6:
-            Gfx_StringSetPosition((slotIdx * SLOT_COLUMN_OFFSET) + 38, 90);
+            Gfx_StringPositionSet((slotIdx * SLOT_COLUMN_OFFSET) + 38, 90);
             break;
 
         case SavegameEntryType_OutOfBlocks:
-            Gfx_StringSetPosition((slotIdx * SLOT_COLUMN_OFFSET) + 32, 90);
+            Gfx_StringPositionSet((slotIdx * SLOT_COLUMN_OFFSET) + 32, 90);
             break;
 
         default:
-            Gfx_StringSetPosition((slotIdx * SLOT_COLUMN_OFFSET) + 6, (D_801E7518[slotIdx] * 20) + 53);
+            Gfx_StringPositionSet((slotIdx * SLOT_COLUMN_OFFSET) + 6, (D_801E7518[slotIdx] * 20) + 53);
             break;
     }
     Gfx_StringDraw(DIALOG_STRS[entryType], 50);
@@ -586,17 +586,17 @@ void SaveScreen_MemCardStateDraw(s32 g_SaveScreen_SaveScreenState, s32 memCardSt
 
     const char* DIALOG_STRS[] = {
         " ",
-        "\x07You_\x01\x01removed_\x01\x01the_\x01\x01MEMORY_\x01\x01""CARD!",
-        "\x07Now_formatting...",
-        "\x07Now_saving...",
-        "\x07Unable_to_create_a_new_file.",
-        "\x07""Finished_saving.",
-        "\x07""Failed_to_save!",
-        "\x07The_data_is_not_found!",
-        "\x07The_data_is_damaged!",
-        "\x07""Failed_to_load!",
-        "\x07""Finished_loading.",
-        "\x07Now_loading..."
+        "\7You_\x01\x01removed_\x01\x01the_\x01\x01MEMORY_\x01\x01""CARD!",
+        "\7Now_formatting...",
+        "\7Now_saving...",
+        "\7Unable_to_create_a_new_file.",
+        "\7""Finished_saving.",
+        "\7""Failed_to_save!",
+        "\7The_data_is_not_found!",
+        "\7The_data_is_damaged!",
+        "\7""Failed_to_load!",
+        "\7""Finished_loading.",
+        "\7Now_loading..."
     };
 
     const s16 X_OFFSETS[] = {
@@ -713,7 +713,7 @@ void SaveScreen_MemCardStateDraw(s32 g_SaveScreen_SaveScreenState, s32 memCardSt
             }
 
             D_801E7554 = strIdx;
-            Gfx_StringSetPosition(160 - (X_OFFSETS[strIdx] >> 1), 186);
+            Gfx_StringPositionSet(160 - (X_OFFSETS[strIdx] >> 1), 186);
             Gfx_StringDraw(DIALOG_STRS[strIdx], DEFAULT_MAP_MESSAGE_LENGTH);
 
             // Finished saving.
@@ -734,9 +734,9 @@ void SaveScreen_WriteOptionsStepDraw(s32 stringIdx, bool optionSelected) // 0x80
     static bool D_801E7558;
 
     const char* DIALOG_STRS[] = {
-        "\x07Is_it_OK_to_overwrite?",
-        "\x07Is_it_OK_to_format?",
-        "\x07Yes__________No"
+        "\7Is_it_OK_to_overwrite?",
+        "\7Is_it_OK_to_format?",
+        "\7Yes__________No"
     };
 
     const u8 X_OFFSETS[] = {
@@ -755,10 +755,10 @@ void SaveScreen_WriteOptionsStepDraw(s32 stringIdx, bool optionSelected) // 0x80
             g_SaveScreen_OverwriteActive = 1;
 
         case 1:
-            Gfx_StringSetPosition(160 - (X_OFFSETS[stringIdx] / 2), 178);
+            Gfx_StringPositionSet(160 - (X_OFFSETS[stringIdx] / 2), 178);
             Gfx_StringDraw(DIALOG_STRS[stringIdx], DEFAULT_MAP_MESSAGE_LENGTH);
-            Gfx_StringSetPosition(104, 196);
-            Gfx_StringDraw("\x07Yes__________No", DEFAULT_MAP_MESSAGE_LENGTH);
+            Gfx_StringPositionSet(104, 196);
+            Gfx_StringDraw("\7Yes__________No", DEFAULT_MAP_MESSAGE_LENGTH);
 
             poly = (POLY_F4*)GsOUT_PACKET_P;
             setPolyF4(poly);
@@ -909,7 +909,7 @@ void SaveScreen_SlotBorder(void) // 0x801E4010
             borderLine = (LINE_F2*)GsOUT_PACKET_P;
             setLineF2(borderLine);
 
-            setRGB0(borderLine, Q8_COLOR(0.0f), Q8_COLOR(1.0f), Q8_COLOR(0.0f));
+            setRGB0(borderLine, 0, 255, 0);
 
             setXY2(borderLine,
                    BORDER_LINES[j][i].vertex0.vx + (g_SelectedSaveSlotIdx * SLOT_COLUMN_OFFSET), BORDER_LINES[j][i].vertex0.vy,
@@ -929,10 +929,10 @@ void SaveScreen_SlotBorder(void) // 0x801E4010
             setPolyG4(glowPoly);
             setSemiTrans(glowPoly, true);
 
-            setRGB0(glowPoly, Q8_COLOR(0.0f), Q8_COLOR(0.5f), Q8_COLOR(0.0f));
-            setRGB1(glowPoly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
-            setRGB2(glowPoly, Q8_COLOR(0.0f), Q8_COLOR(0.5f), Q8_COLOR(0.0f));
-            setRGB3(glowPoly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+            setRGB0(glowPoly, 0, 128, 0);
+            setRGB1(glowPoly, 0, 0, 0);
+            setRGB2(glowPoly, 0, 128, 0);
+            setRGB3(glowPoly, 0, 0, 0);
 
             setXY4(glowPoly,
                    BORDER_GLOW_QUADS[j][i].vertex0.vx + (g_SelectedSaveSlotIdx * SLOT_COLUMN_OFFSET), BORDER_GLOW_QUADS[j][i].vertex0.vy,
@@ -969,15 +969,15 @@ void SaveScreen_SlotStatusMsgShineDraw(s32 slotIdx) // 0x801E43C8
         setPolyF4(poly);
         setSemiTrans(poly, true);
 
-        if ((u16)colorTimer < Q8_COLOR(0.125f))
+        if ((u16)colorTimer < 32)
         {
-            color = (colorTimer * 2) + Q8_COLOR(0.125f);
-            setRGB0(poly, color, color, Q8_COLOR(0.125f));
+            color = (colorTimer * 2) + 32;
+            setRGB0(poly, color, color, 32);
         }
         else
         {
-            color = Q8_COLOR(0.375f) - ((colorTimer - Q8_COLOR(0.125f)) * 2);
-            setRGB0(poly, color, color, Q8_COLOR(0.125f));
+            color = Q8_COLOR(0.375f) - ((colorTimer - 32) * 2);
+            setRGB0(poly, color, color, 32);
         }
 
         setXY4(poly,
@@ -1162,10 +1162,10 @@ void SaveScreen_NavigationDraw(s32 slotIdx, s32 saveCount, s32 selectedSaveIdx, 
         trackPoly = (POLY_G4*)GsOUT_PACKET_P;
         setPolyG4(trackPoly);
 
-        setRGB0(trackPoly, Q8_COLOR(0.125f), Q8_COLOR(0.125f), Q8_COLOR(0.125f));
-        setRGB1(trackPoly, Q8_COLOR(0.125f), Q8_COLOR(0.125f), Q8_COLOR(0.125f));
-        setRGB2(trackPoly, Q8_COLOR(0.5f),   Q8_COLOR(0.5f),   Q8_COLOR(0.5f));
-        setRGB3(trackPoly, Q8_COLOR(0.5f),   Q8_COLOR(0.5f),   Q8_COLOR(0.5f));
+        setRGB0(trackPoly, 32, 32, 32);
+        setRGB1(trackPoly, 32, 32, 32);
+        setRGB2(trackPoly, 128,   128,   128);
+        setRGB3(trackPoly, 128,   128,   128);
 
         trackOffsetX = (slotIdx * SLOT_COLUMN_OFFSET) - 139;
         setXY4(trackPoly,
@@ -1515,13 +1515,13 @@ void SaveScreen_RectSaveInfoDraw(s_Line2d* line) // 0x801E5898
 
         if (i & 0x1)
         {
-            setRGB0(line_g2, Q8_COLOR(0.625f),  Q8_COLOR(0.5f),    Q8_COLOR(0.25f));
+            setRGB0(line_g2, Q8_COLOR(0.625f),  128,    64);
             setRGB1(line_g2, Q8_COLOR(0.6875f), Q8_COLOR(0.6875f), Q8_COLOR(0.6875f));
         }
         else
         {
             setRGB0(line_g2, Q8_COLOR(0.6875f), Q8_COLOR(0.6875f), Q8_COLOR(0.6875f));
-            setRGB1(line_g2, Q8_COLOR(0.625f),  Q8_COLOR(0.5f),    Q8_COLOR(0.25f));
+            setRGB1(line_g2, Q8_COLOR(0.625f),  128,    64);
         }
 
         setXY2(line_g2,
@@ -1535,6 +1535,7 @@ void SaveScreen_RectSaveInfoDraw(s_Line2d* line) // 0x801E5898
 
 void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
 {
+    // @unused
     char* labelStrs[] = {
         "Data",
         "Save",
@@ -1544,20 +1545,20 @@ void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
         "You_need_1_free_block\n__to_create_a_new_file."
     };
 
-    GsOT*               ot;
-    s32                 saveId;
-    s32                 mins;
-    s32                 beamColorFlag;
-    s32                 sec;
-    s32                 hours;
-    s32                 saveDataIdx;
-    s32                 i;
-    s32                 digitCount;
-    s32                 offset;
-    u32                 hyperBlasterBeamColor;
-    u32                 timeInSec;
+    GsOT*                   ot;
+    s32                     saveId;
+    s32                     mins;
+    s32                     beamColorFlag;
+    s32                     sec;
+    s32                     hours;
+    s32                     saveDataIdx;
+    s32                     i;
+    s32                     digitCount;
+    s32                     offset;
+    u32                     hyperBlasterBeamColor;
+    u32                     timeInSec;
     s_MemCard_SaveMetadata* ptr;
-    POLY_G4*            poly;
+    POLY_G4*                poly;
 
     ot = &g_OrderingTable2[g_ActiveBufferIdx];
 
@@ -1565,8 +1566,8 @@ void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
 
     if (g_MemCard_ActiveMemCardSlotSaves[selectedSaveIdx].type == SavegameEntryType_NewFile)
     {
-        Gfx_StringSetColor(StringColorId_White);
-        Gfx_StringSetPosition(66, 178);
+        Gfx_StringColorSet(StringColorId_White);
+        Gfx_StringPositionSet(66, 178);
         Gfx_StringDraw("You_need_1_free_block\n__to_create_a_new_file.", 50);
     }
     else if (g_MemCard_ActiveMemCardSlotSaves[selectedSaveIdx].type == SavegameEntryType_Save)
@@ -1581,31 +1582,31 @@ void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
         timeInSec = FP_FROM(ptr->gameplayTimer, Q12_SHIFT);
 
         offset = ptr->add290Hours;
-        hours  = (timeInSec / 3600) + offset * 290;
+        hours  = (timeInSec / 3600) + (offset * 290);
 
         hyperBlasterBeamColor = ptr->pickedUpSpecialItemCount;
 
         mins = (timeInSec / 60) % 60;
         sec  = timeInSec % 60;
 
-        Gfx_StringSetColor(StringColorId_White);
-        Gfx_StringSetPosition(40, 178);
+        Gfx_StringColorSet(StringColorId_White);
+        Gfx_StringPositionSet(40, 178);
         Gfx_StringDraw("Data", 5);
 
-        digitCount = saveDataIdx < 10;
+        digitCount = (saveDataIdx < 10) ? 1 : 0;
 
-        Gfx_StringSetPosition(digitCount * 5 + 92, 178);
+        Gfx_StringPositionSet((digitCount * 5) + 92, 178);
         Gfx_StringDrawInt(2, saveDataIdx);
 
-        Gfx_StringSetPosition(40, 196);
+        Gfx_StringPositionSet(40, 196);
         Gfx_StringDraw("Save", 5);
 
-        digitCount = saveId < 10;
+        digitCount = (saveId < 10) ? 1 : 0;
 
-        Gfx_StringSetPosition(digitCount * 5 + 92, 196);
+        Gfx_StringPositionSet((digitCount * 5) + 92, 196);
         Gfx_StringDrawInt(2, saveId);
 
-        Gfx_StringSetPosition(128, 178);
+        Gfx_StringPositionSet(128, 178);
         Gfx_StringDraw("Time", 5);
 
         digitCount = 0;
@@ -1621,22 +1622,23 @@ void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
             }
         }
 
-        Gfx_StringSetPosition((digitCount * 10) + 176, 178);
+        Gfx_StringPositionSet((digitCount * 10) + 176, 178);
         Gfx_StringDrawInt(3, hours);
         Gfx_StringDraw("_:_", 3);
 
-        digitCount = mins < 10;
+        digitCount = (mins < 10) ? 1 : 0;
 
-        Gfx_StringSetPosition((digitCount * 10) + 220, 178);
+        Gfx_StringPositionSet((digitCount * 10) + 220, 178);
         Gfx_StringDrawInt(2, mins);
         Gfx_StringDraw("_:_", 3);
 
-        digitCount = sec < 10;
+        digitCount = (sec < 10) ? 1 : 0;
 
-        Gfx_StringSetPosition((digitCount * 10) + 254, 178);
+        Gfx_StringPositionSet((digitCount * 10) + 254, 178);
         Gfx_StringDrawInt(2, sec);
 
-        if (!(hyperBlasterBeamColor & 0x18)) // Checks if the player have no special hyper blaster beam color unlocked.
+        // Check if no special hyper blaster beam color is unlocked.
+        if (!(hyperBlasterBeamColor & 0x18))
         {
             return;
         }
@@ -1656,18 +1658,18 @@ void SaveScreen_ElementInfoDraw(s32 slotIdx, s32 selectedSaveIdx) // 0x801E5E18
 
             if (i != 0)
             {
-                setRGB0(poly, (beamColorFlag > 0) ? Q8_COLOR(0.0f) : Q8_COLOR(1.0f), Q8_COLOR(1.0f), Q8_COLOR(0.0f));
-                setRGB2(poly, (beamColorFlag > 0) ? Q8_COLOR(0.0f) : Q8_COLOR(1.0f), Q8_COLOR(1.0f), Q8_COLOR(0.0f));
-                setRGB1(poly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
-                setRGB3(poly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
+                setRGB0(poly, (beamColorFlag > 0) ? 0 : 255, 255, 0);
+                setRGB2(poly, (beamColorFlag > 0) ? 0 : 255, 255, 0);
+                setRGB1(poly, 0, 0, 0);
+                setRGB3(poly, 0, 0, 0);
                 setXY4(poly, -30, 89, -30, 93, 120, 89, 120, 93);
             }
             else
             {
-                setRGB0(poly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
-                setRGB2(poly, Q8_COLOR(0.0f), Q8_COLOR(0.0f), Q8_COLOR(0.0f));
-                setRGB1(poly, (beamColorFlag > 0) ? Q8_COLOR(0.0f) : Q8_COLOR(1.0f), Q8_COLOR(1.0f), Q8_COLOR(0.0f));
-                setRGB3(poly, (beamColorFlag > 0) ? Q8_COLOR(0.0f) : Q8_COLOR(1.0f), Q8_COLOR(1.0f), Q8_COLOR(0.0f));
+                setRGB0(poly, 0, 0, 0);
+                setRGB2(poly, 0, 0, 0);
+                setRGB1(poly, (beamColorFlag > 0) ? 0 : 255, 255, 0);
+                setRGB3(poly, (beamColorFlag > 0) ? 0 : 255, 255, 0);
                 setXY4(poly, -30, 85, -30, 89, 120, 85, 120, 89);
             }
 
@@ -1717,14 +1719,14 @@ void SaveScreen_Init(void) // 0x801E63C0
     g_SaveScreen_IsLoadError = false;
     if (g_GameWork.gameState == GameState_AutoLoadSavegame || g_GameWork.gameState == GameState_LoadSavegameScreen)
     {
-        if (D_800A97D8 != 0)
+        if (g_SaveScreen_IsInSaveScreen)
         {
             g_MemCard_AllMemCardsStatus = 0;
         }
     }
 
     g_SaveScreen_MemCardStateTextTimer = 0;
-    D_800A97D8              = g_GameWork.gameState == GameState_SaveScreen;
+    g_SaveScreen_IsInSaveScreen        = g_GameWork.gameState == GameState_SaveScreen;
 
     SaveScreen_ScreenInfoClear();
     Game_StateStepIncrement(0);

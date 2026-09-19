@@ -16,11 +16,12 @@
 #include "screens/options.h"
 #include "screens/stream/stream.h"
 
-#define LINE_CURSOR_TIMER_MAX 8
-#define LAYER_24              24
-#define LAYER_40              40
-#define LAYER_36              36
-#define LAYER_8148            8148
+#define LINE_CURSOR_TIMER_MAX          8
+#define LAYER_24                       24
+#define LAYER_40                       40
+#define LAYER_36                       36
+#define LAYER_8148                     8148
+#define OPTIONS_ENTRY_STRING_LAYER_IDX 8 // TODO: Leftover from JAP builds or required for all?
 
 s32  g_MainOptionsMenu_SelectedEntry      = 0;
 s32  g_ExtraOptionsMenu_SelectedEntry     = 0;
@@ -250,7 +251,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
             !(g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter) &&
             (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.option))
         {
-            Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+            Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
             Game_StateStepSet(0, OptionsMenuState_Leave);
             return;
         }
@@ -259,13 +260,13 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
         if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighUp)
         {
             s32 var = 1;
-            Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+            Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
             g_ExtraOptionsMenu_SelectedEntry  = ((g_ExtraOptionsMenu_SelectedEntry - var) + g_ExtraOptionsMenu_EntryCount) % g_ExtraOptionsMenu_EntryCount;
             g_Options_SelectionHighlightTimer = 0;
         }
         if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighDown)
         {
-            Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+            Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
             g_ExtraOptionsMenu_SelectedEntry++;
             g_ExtraOptionsMenu_SelectedEntry  = g_ExtraOptionsMenu_SelectedEntry % g_ExtraOptionsMenu_EntryCount;
             g_Options_SelectionHighlightTimer = 0;
@@ -278,7 +279,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                     g_GameWork.config.extraWeaponCtrl = !g_GameWork.config.extraWeaponCtrl;
                 }
                 break;
@@ -287,12 +288,12 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & ControllerFlag_LStickHighRight)
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                     g_ExtraOptionsMenu_SelectedBloodColorEntry++;
                 }
                 if (g_Controller0->buttonFlags.clicked & ControllerFlag_LStickHighLeft)
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                     g_ExtraOptionsMenu_SelectedBloodColorEntry += 3;
                 }
 
@@ -322,7 +323,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraViewCtrl = !g_GameWork.config.extraViewCtrl;
@@ -333,7 +334,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraRetreatTurn = (s8)g_GameWork.config.extraRetreatTurn == 0;
@@ -344,7 +345,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraWalkRunCtrl = (s8)g_GameWork.config.extraWalkRunCtrl == 0;
@@ -355,7 +356,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraAutoAiming = (s8)g_GameWork.config.extraAutoAiming == 0;
@@ -366,7 +367,7 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraViewMode = !g_GameWork.config.extraViewMode;
@@ -377,14 +378,14 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
                 // Scroll left/right.
                 if (g_Controller0->buttonFlags.clicked & ControllerFlag_LStickHighRight)
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraBulletAdjust++;
                 }
                 if (g_Controller0->buttonFlags.clicked & ControllerFlag_LStickHighLeft)
                 {
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                     // Set config.
                     g_GameWork.config.extraBulletAdjust = g_GameWork.config.extraBulletAdjust + (g_ExtraOptionsMenu_BulletMultMax - 1);
@@ -396,17 +397,17 @@ void Options_ExtraOptionsMenu_Control(void) // 0x801E318C
 
     // Leave menu.
     if ((g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.cancel |
-                                          (ControllerFlag_L2 | ControllerFlag_R2 |
-                                           ControllerFlag_L1 | ControllerFlag_R1))) &&
+                                               (ControllerFlag_L2 | ControllerFlag_R2 |
+                                                ControllerFlag_L1 | ControllerFlag_R1))) &&
         g_GameWork.gameStateSteps[0] != OptionsMenuState_LeaveExtraOptions)
     {
         if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.cancel)
         {
-            Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+            Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
         }
         else
         {
-            Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+            Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
         }
 
         ScreenFade_Start(true, false, false);
@@ -457,7 +458,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         !(g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter) &&
         (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.option))
     {
-        Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+        Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
         Game_StateStepSet(0, OptionsMenuState_Leave);
         return;
     }
@@ -465,14 +466,14 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
     // Move selection cursor up/down.
     if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighUp)
     {
-        Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+        Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
         g_Options_SelectionHighlightTimer = 0;
         g_MainOptionsMenu_SelectedEntry   = (g_MainOptionsMenu_SelectedEntry + (MainOptionsMenuEntry_Count - 1)) % MainOptionsMenuEntry_Count;
     }
     if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighDown)
     {
-        Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+        Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
         g_Options_SelectionHighlightTimer = 0;
         g_MainOptionsMenu_SelectedEntry   = (g_MainOptionsMenu_SelectedEntry + 1) % MainOptionsMenuEntry_Count;
@@ -484,9 +485,9 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         case MainOptionsMenuEntry_Exit:
             // Exit menu to gameplay.
             if (g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                 g_GameWorkPtr->config.controllerConfig.cancel))
+                                                      g_GameWorkPtr->config.controllerConfig.cancel))
             {
-                Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
                 Game_StateStepSet(0, OptionsMenuState_Leave);
             }
             break;
@@ -495,7 +496,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
             // Enter controller screen.
             if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter)
             {
-                Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
                 Fs_QueueStartReadTim(FILE_TIM_OPTION2_TIM, IMAGE_BUFFER_3, &g_ControllerButtonAtlasImg);
                 ScreenFade_Start(true, false, false);
                 Game_StateStepSet(0, OptionsMenuState_EnterController);
@@ -506,7 +507,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
             // Enter screen position screen.
             if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter)
             {
-                Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
                 ScreenFade_Start(true, false, false);
                 Game_StateStepSet(0, OptionsMenuState_EnterScreenPos);
             }
@@ -515,7 +516,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         case MainOptionsMenuEntry_Brightness:
             if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter)
             {
-                Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
                 if (g_GameWork.gameStatePrev == GameState_MainMenu)
                 {
                     Fs_QueueStartReadTim(FILE_TIM_OP_BRT_E_TIM, IMAGE_BUFFER_3, &g_BrightnessScreenImg0);
@@ -533,7 +534,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         case MainOptionsMenuEntry_Vibration:
             if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
             {
-                Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                 g_GameWork.config.vibrationEnabled = !g_GameWork.config.vibrationEnabled << 7;
             }
             break;
@@ -541,7 +542,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         case MainOptionsMenuEntry_AutoLoad:
             if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
             {
-                Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                 g_GameWork.config.autoLoad = (s8)g_GameWork.config.autoLoad == 0;
             }
             break;
@@ -549,7 +550,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
         case MainOptionsMenuEntry_Sound:
             if (g_Controller0->buttonFlags.clicked & (ControllerFlag_LStickHighRight | ControllerFlag_LStickHighLeft))
             {
-                Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
 
                 // Set config.
                 audioType                           = AudioMode_Stereo;
@@ -579,16 +580,16 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
             // Scroll left/right.
             if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighRight)
             {
-                vol = vol + SOUND_VOL_STEP;
+                vol += SOUND_VOL_STEP;
             }
             if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighLeft)
             {
-                vol = vol - SOUND_VOL_STEP;
+                vol -= SOUND_VOL_STEP;
             }
 
             // Set config.
             vol = CLAMP(vol, 0, OPT_SOUND_VOLUME_MAX);
-            Sd_SetVolume(OPT_SOUND_VOLUME_MAX, vol, g_GameWork.config.volumeSe);
+            Sd_GlobalVolumeSet(OPT_SOUND_VOLUME_MAX, vol, g_GameWork.config.volumeSe);
             g_GameWork.config.volumeBgm = vol;
             break;
 
@@ -617,7 +618,7 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
 
             vol = CLAMP(vol, 0, OPT_SOUND_VOLUME_MAX);
 
-            Sd_SetVolume(OPT_SOUND_VOLUME_MAX, vol, g_GameWork.config.volumeSe);
+            Sd_GlobalVolumeSet(OPT_SOUND_VOLUME_MAX, vol, g_GameWork.config.volumeSe);
             g_GameWork.config.volumeSe = vol;
             break;
 
@@ -628,14 +629,14 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
     vol = 0;
 
     if (g_Controller0->buttonFlags.clicked & (ControllerFlag_L2 | ControllerFlag_R2 |
-                                         ControllerFlag_L1 | ControllerFlag_R1))
+                                              ControllerFlag_L1 | ControllerFlag_R1))
     {
         if (g_GameWork.gameStateSteps[0] == OptionsMenuState_EnterExtraOptions)
         {
             return;
         }
 
-        Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+        Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
 
         ScreenFade_Start(true, false, false);
         Game_StateStepSet(0, OptionsMenuState_EnterExtraOptions);
@@ -646,10 +647,10 @@ void Options_MainOptionsMenu_Control(void) // 0x801E3770
          !(g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter)) &&
         (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.cancel))
     {
-        Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+        Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
 
         g_Options_SelectionHighlightTimer = 0;
-        g_MainOptionsMenu_SelectedEntry         = MainOptionsMenuEntry_Exit;
+        g_MainOptionsMenu_SelectedEntry   = MainOptionsMenuEntry_Exit;
     }
 
     #undef SOUND_VOL_STEP
@@ -739,7 +740,7 @@ void Options_MainOptionsMenu_VolumeBarDraw(bool isSfx, u8 vol) // 0x801E3FB8
 
 void Options_ExtraOptionsMenu_EntryStringsDraw(void) // 0x801E416C
 {
-    #define LINE_BASE_X   64
+    #define LINE_BASE_X   (SCREEN_WIDTH / 5)
     #define LINE_BASE_Y   64
     #define LINE_OFFSET_X 16
     #define LINE_OFFSET_Y 16
@@ -777,16 +778,16 @@ void Options_ExtraOptionsMenu_EntryStringsDraw(void) // 0x801E416C
     Math_Sin(g_Options_SelectionHighlightTimer << 7);
 
     // Draw heading string.
-    Gfx_StringSetColor(StringColorId_White);
-    Gfx_StringSetPosition(STR_POS.vx, STR_POS.vy);
-    Gfx_Strings2dLayerIdxSet(8);
+    Gfx_StringColorSet(StringColorId_White);
+    Gfx_StringPositionSet(STR_POS.vx, STR_POS.vy);
+    Gfx_StringLayerIdxSet(OPTIONS_ENTRY_STRING_LAYER_IDX);
     Gfx_StringDraw(EXTRA_OPTIONS_STR, DEFAULT_MAP_MESSAGE_LENGTH);
 
     // Draw entry strings.
     for (i = 0; i < g_ExtraOptionsMenu_EntryCount; i++)
     {
-        Gfx_StringSetPosition(LINE_BASE_X, LINE_BASE_Y + (i * LINE_OFFSET_Y));
-        Gfx_Strings2dLayerIdxSet(8);
+        Gfx_StringPositionSet(LINE_BASE_X, LINE_BASE_Y + (i * LINE_OFFSET_Y));
+        Gfx_StringLayerIdxSet(OPTIONS_ENTRY_STRING_LAYER_IDX);
         Gfx_StringDraw(ENTRY_STRS[i], DEFAULT_MAP_MESSAGE_LENGTH);
     }
 
@@ -834,20 +835,20 @@ void Options_MainOptionsMenu_EntryStringsDraw(void) // 0x801E42EC
     Math_Sin(g_Options_SelectionHighlightTimer << 7);
 
     // Draw heading string.
-    Gfx_StringSetColor(StringColorId_White);
-    Gfx_StringSetPosition(strPos.vx, strPos.vy);
-    Gfx_Strings2dLayerIdxSet(8);
+    Gfx_StringColorSet(StringColorId_White);
+    Gfx_StringPositionSet(strPos.vx, strPos.vy);
+    Gfx_StringLayerIdxSet(OPTIONS_ENTRY_STRING_LAYER_IDX);
     Gfx_StringDraw(OPTIONS_STR, DEFAULT_MAP_MESSAGE_LENGTH);
 
     // Draw entry strings.
     for (i = 0; i < MainOptionsMenuEntry_Count; i++)
     {
-        Gfx_StringSetPosition(LINE_BASE_X, LINE_BASE_Y + (i * LINE_OFFSET_Y));
-        Gfx_Strings2dLayerIdxSet(8);
+        Gfx_StringPositionSet(LINE_BASE_X, LINE_BASE_Y + (i * LINE_OFFSET_Y));
+        Gfx_StringLayerIdxSet(OPTIONS_ENTRY_STRING_LAYER_IDX);
         Gfx_StringDraw(ENTRY_STRS[i], DEFAULT_MAP_MESSAGE_LENGTH);
     }
 
-    Gfx_StringsReset2dLayerIdx();
+    Gfx_StringLayerIdxReset();
 
     #undef LINE_BASE_X
     #undef LINE_BASE_Y
@@ -1158,7 +1159,7 @@ void Options_ExtraOptionsMenu_ConfigDraw(void) // 0x801E4B2C
     s32 i;
     s32 j;
 
-    Gfx_StringSetColor(StringColorId_White);
+    Gfx_StringColorSet(StringColorId_White);
 
     // Draw left/right arrows for subset of options.
     if (g_ExtraOptionsMenu_SelectedEntry < (u32)ExtraOptionsMenuEntry_Count)
@@ -1187,7 +1188,7 @@ void Options_ExtraOptionsMenu_ConfigDraw(void) // 0x801E4B2C
         {
             case ExtraOptionsMenuEntry_WeaponCtrl:
                 strPosX = (g_GameWork.config.extraWeaponCtrl != 0) ? 217 : 212;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_WeaponCtrl));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_WeaponCtrl));
                 Gfx_StringDraw(CONFIG_STRS[!g_GameWork.config.extraWeaponCtrl], 10);
                 break;
 
@@ -1195,19 +1196,19 @@ void Options_ExtraOptionsMenu_ConfigDraw(void) // 0x801E4B2C
                 switch (g_ExtraOptionsMenu_SelectedBloodColorEntry)
                 {
                     case BloodColorMenuEntry_Normal:
-                        Gfx_StringSetPosition(210, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
+                        Gfx_StringPositionSet(210, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
                         break;
 
                     case BloodColorMenuEntry_Green:
-                        Gfx_StringSetPosition(214, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
+                        Gfx_StringPositionSet(214, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
                         break;
 
                     case BloodColorMenuEntry_Violet:
-                        Gfx_StringSetPosition(214, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
+                        Gfx_StringPositionSet(214, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
                         break;
 
                     case BloodColorMenuEntry_Black:
-                        Gfx_StringSetPosition(217, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
+                        Gfx_StringPositionSet(217, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_Blood));
                         break;
                 }
 
@@ -1216,36 +1217,36 @@ void Options_ExtraOptionsMenu_ConfigDraw(void) // 0x801E4B2C
 
             case ExtraOptionsMenuEntry_ViewCtrl:
                 strPosX = !g_GameWork.config.extraViewCtrl ? 210 : 206;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_ViewCtrl));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_ViewCtrl));
                 Gfx_StringDraw(CONFIG_STRS[((g_GameWork.config.extraViewCtrl != 0) ? 32 : 28) >> 2], 10);
                 break;
 
             case ExtraOptionsMenuEntry_RetreatTurn:
                 strPosX = !g_GameWork.config.extraRetreatTurn ? 210 : 206;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_RetreatTurn));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_RetreatTurn));
                 Gfx_StringDraw(CONFIG_STRS[((g_GameWork.config.extraRetreatTurn != 0) ? 32 : 28) >> 2], 10);
                 break;
 
             case ExtraOptionsMenuEntry_MovementCtrl:
                 strPosX = !g_GameWork.config.extraWalkRunCtrl ? 210 : 206;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_MovementCtrl));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_MovementCtrl));
                 Gfx_StringDraw(CONFIG_STRS[((g_GameWork.config.extraWalkRunCtrl != 0) ? 32 : 28) >> 2], 10);
                 break;
 
             case ExtraOptionsMenuEntry_AutoAiming:
                 strPosX = !g_GameWork.config.extraAutoAiming ? 228 : 226;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_AutoAiming));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_AutoAiming));
                 Gfx_StringDraw(CONFIG_STRS[((g_GameWork.config.extraAutoAiming != 0) ? 40 : 36) >> 2], 10);
                 break;
 
             case ExtraOptionsMenuEntry_ViewMode:
                 strPosX = !g_GameWork.config.extraViewMode ? 210 : 200;
-                Gfx_StringSetPosition(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_ViewMode));
+                Gfx_StringPositionSet(strPosX, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_ViewMode));
                 Gfx_StringDraw(CONFIG_STRS[(g_GameWork.config.extraViewMode ? 48 : 44) >> 2], 10);
                 break;
 
             case ExtraOptionsMenuEntry_BulletMult:
-                Gfx_StringSetPosition(230, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_BulletMult));
+                Gfx_StringPositionSet(230, STR_BASE_Y + (STR_OFFSET_Y * ExtraOptionsMenuEntry_BulletMult));
                 Gfx_StringDraw(CONFIG_STRS[g_GameWork.config.extraBulletAdjust + 13], 10);
                 break;
         }
@@ -1295,7 +1296,7 @@ void Options_MainOptionsMenu_ConfigDraw(void) // 0x801E4FFC
     s32 strIdx;
     s32 i;
 
-    Gfx_StringSetColor(StringColorId_White);
+    Gfx_StringColorSet(StringColorId_White);
 
     // Draw left/right arrows for subset of options.
     if (g_MainOptionsMenu_SelectedEntry >= 4 && g_MainOptionsMenu_SelectedEntry < 9)
@@ -1323,7 +1324,7 @@ void Options_MainOptionsMenu_ConfigDraw(void) // 0x801E4FFC
         {
             case 0:
                 strPosX = !g_GameWork.config.vibrationEnabled ? 214 : 216;
-                Gfx_StringSetPosition(strPosX, 120);
+                Gfx_StringPositionSet(strPosX, 120);
 
                 strIdx = !g_GameWork.config.vibrationEnabled;
                 Gfx_StringDraw(CONFIG_STRS[strIdx], 10);
@@ -1331,7 +1332,7 @@ void Options_MainOptionsMenu_ConfigDraw(void) // 0x801E4FFC
 
             case 1:
                 strPosX = !g_GameWork.config.autoLoad ? 214 : 216;
-                Gfx_StringSetPosition(strPosX, 136);
+                Gfx_StringPositionSet(strPosX, 136);
 
                 strIdx = !g_GameWork.config.autoLoad;
                 Gfx_StringDraw(CONFIG_STRS[strIdx], 10);
@@ -1339,7 +1340,7 @@ void Options_MainOptionsMenu_ConfigDraw(void) // 0x801E4FFC
 
             case 2:
                 strPosX = g_GameWork.config.soundType ? 194 : 206;
-                Gfx_StringSetPosition(strPosX, 152);
+                Gfx_StringPositionSet(strPosX, 152);
 
                 strIdx = g_GameWork.config.soundType + 2;
                 Gfx_StringDraw(CONFIG_STRS[strIdx], 10);
@@ -1411,7 +1412,7 @@ void Options_ScreenPosMenu_Control(void) // 0x801E53A0
             if (g_GameWorkConst->config.screenPositionX != screenPosMenu_PositionX ||
                 g_GameWorkConst->config.screenPositionY != screenPosMenu_PositionY)
             {
-                Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
             }
 
             // Start background color fade.
@@ -1427,7 +1428,7 @@ void Options_ScreenPosMenu_Control(void) // 0x801E53A0
             // Leave menu.
             if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.cancel)
             {
-                Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+                Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
 
                 ScreenFade_Start(true, false, false);
                 Game_StateStepIncrement(1);
@@ -1650,11 +1651,11 @@ void Options_ScreenPosMenu_ConfigDraw(void) // 0x801E5CBC
     addPrim((u8*)ot->org + LAYER_40, poly);
     GsOUT_PACKET_P = (u8*)poly + sizeof(POLY_F4);
 
-    Gfx_StringSetPosition(108 - g_GameWorkConst->config.screenPositionX, 162 - g_GameWorkConst->config.screenPositionY);
+    Gfx_StringPositionSet(108 - g_GameWorkConst->config.screenPositionX, 162 - g_GameWorkConst->config.screenPositionY);
     Gfx_StringDraw(AXIS_OFFSET_STRS[0], 10);
     Gfx_StringDrawInt(3, g_GameWorkConst->config.screenPositionX);
 
-    Gfx_StringSetPosition(168 - g_GameWorkConst->config.screenPositionX, 162 - g_GameWorkConst->config.screenPositionY);
+    Gfx_StringPositionSet(168 - g_GameWorkConst->config.screenPositionX, 162 - g_GameWorkConst->config.screenPositionY);
     Gfx_StringDraw(AXIS_OFFSET_STRS[1], 10);
     Gfx_StringDrawInt(3, g_GameWorkConst->config.screenPositionY);
 }
@@ -1668,25 +1669,22 @@ void Options_BrightnessMenu_Control(void) // 0x801E6018
     // Handle menu state.
     switch (g_GameWork.gameStateSteps[1])
     {
-        case BrightnessMenuState_0:
-            // Entry.
-            Game_StateStepSet(1, BrightnessMenuState_1);
+        case BrightnessMenuState_Enter:
+            Game_StateStepSet(1, BrightnessMenuState_StartFade);
             break;
 
-        case BrightnessMenuState_1:
-            // Set fade.
+        case BrightnessMenuState_StartFade:
             ScreenFade_Start(true, true, false);
-            Game_StateStepSet(1, BrightnessMenuState_2);
+            Game_StateStepSet(1, BrightnessMenuState_SetConfig);
             break;
 
-        case BrightnessMenuState_2:
-            // Set config.
+        case BrightnessMenuState_SetConfig:
             if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighLeft)
             {
                 if (g_GameWork.config.brightness != 0)
                 {
                     g_GameWork.config.brightness--;
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                 }
             }
             if (g_Controller0->buttonFlags.pulsed & ControllerFlag_LStickHighRight)
@@ -1694,21 +1692,21 @@ void Options_BrightnessMenu_Control(void) // 0x801E6018
                 if (g_GameWork.config.brightness < 7)
                 {
                     g_GameWork.config.brightness++;
-                    Sd_PlaySfx(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuMove, Q8(0.0f), Q8(0.25f));
                 }
             }
 
             // Fade screen and leave menu.
             if (g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                 g_GameWorkPtr->config.controllerConfig.cancel))
+                                                      g_GameWorkPtr->config.controllerConfig.cancel))
             {
                 if (g_Controller0->buttonFlags.clicked & g_GameWorkPtr->config.controllerConfig.enter)
                 {
-                    Sd_PlaySfx(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuConfirm, Q8(0.0f), Q8(0.25f));
                 }
                 else
                 {
-                    Sd_PlaySfx(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
+                    Sd_SfxPlay(Sfx_MenuCancel, Q8(0.0f), Q8(0.25f));
                 }
 
                 ScreenFade_Start(true, false, false);
@@ -1719,9 +1717,9 @@ void Options_BrightnessMenu_Control(void) // 0x801E6018
         case BrightnessMenuState_Leave:
             // Switch to previous menu.
             // TODO: Odd check for `ScreenFade_IsFinished()`.
-            if ( (g_Screen_FadeStatus & (1 << 2)) &&
-                !(g_Screen_FadeStatus & (1 << 1)) &&
-                 (g_Screen_FadeStatus & (1 << 0)))
+            if ( (g_ScreenFade_Status & (1 << 2)) &&
+                !(g_ScreenFade_Status & (1 << 1)) &&
+                 (g_ScreenFade_Status & (1 << 0)))
             {
                 ScreenFade_Start(true, true, false);
                 Game_StateStepSet(0, OptionsMenuState_LeaveBrightness);
@@ -1752,8 +1750,8 @@ void Options_BrightnessMenu_ConfigDraw(void) // 0x801E6238
 {
     const char* LEVEL_STR = "LEVEL_________";
 
-    Gfx_StringSetColor(StringColorId_White);
-    Gfx_StringSetPosition(SCREEN_POSITION_X(25.0f), SCREEN_POSITION_Y(79.5f));
+    Gfx_StringColorSet(StringColorId_White);
+    Gfx_StringPositionSet(SCREEN_WIDTH / 4, 190);
     Gfx_StringDraw(LEVEL_STR, 20);
     Gfx_StringDrawInt(1, g_GameWork.config.brightness);
 }
@@ -2056,7 +2054,7 @@ void Options_ControllerMenu_Control(void) // 0x801E69BC
 
             // Leave menu.
             if (g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                 g_GameWorkPtr->config.controllerConfig.cancel))
+                                                      g_GameWorkPtr->config.controllerConfig.cancel))
             {
                 SD_Call(Sfx_MenuCancel);
 
@@ -2075,7 +2073,8 @@ void Options_ControllerMenu_Control(void) // 0x801E69BC
                 Game_StateStepSet(1, ControllerMenuState_Type1);
             }
             // Move selection cursor left/right.
-            else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft | ControllerFlag_LStickHighRight))
+            else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft |
+                                                             ControllerFlag_LStickHighRight))
             {
                 Game_StateStepSet(1, ControllerMenuState_Actions);
             }
@@ -2111,7 +2110,8 @@ void Options_ControllerMenu_Control(void) // 0x801E69BC
                     Game_StateStepSet(1, (g_GameWork.gameStateSteps[1] + 1) & 3); // % 4
                 }
                 // Move selection cursor left/right.
-                else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft | ControllerFlag_LStickHighRight))
+                else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft |
+                                                                 ControllerFlag_LStickHighRight))
                 {
                     Game_StateStepSet(1, ControllerMenuState_Actions);
                 }
@@ -2145,7 +2145,8 @@ void Options_ControllerMenu_Control(void) // 0x801E69BC
                 }
             }
             // Move selection cursor left/right.
-            else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft | ControllerFlag_LStickHighRight))
+            else if (g_Controller0->buttonFlags.pulsedGui & (ControllerFlag_LStickHighLeft |
+                                                             ControllerFlag_LStickHighRight))
             {
                 Game_StateStepSet(1, selectedEntries.preset);
             }
@@ -2310,7 +2311,6 @@ s32 Options_ControllerMenu_ConfigUpdate(s32 actionIdx) // 0x801E6CF4
     return boundActionIdx;
 }
 
-
 void Options_ControllerMenu_EntriesDraw(bool isOnRightPane, s32 presetsEntryIdx, s32 actionsEntryIdx, s32 boundActionIdx) // 0x801E6F60
 {
     #define STR_BASE_Y    22
@@ -2370,7 +2370,7 @@ void Options_ControllerMenu_EntriesDraw(bool isOnRightPane, s32 presetsEntryIdx,
     };
 
     /** @brief Controller menu entry strings for the presets pane on the left. */
-    static const char* CONTROLLER_MENU_PRESETS_PANE_ENTRY_STRINGS[] = {
+    static const char* PRESETS_PANE_ENTRY_STRS[] = {
         "EXIT",
         "TYPE_1",
         "TYPE_2",
@@ -2378,7 +2378,7 @@ void Options_ControllerMenu_EntriesDraw(bool isOnRightPane, s32 presetsEntryIdx,
     };
 
     /** @brief Controller menu entry strings for the actions pane on the right. */
-    static const char* CONTROLLER_MENU_ACTIONS_PANE_ENTRY_STRINGS[] = {
+    static const char* ACTIONS_PANE_ENTRY_STRS[] = {
         "ENTER",
         "CANCEL",
         "SKIP",
@@ -2403,8 +2403,8 @@ void Options_ControllerMenu_EntriesDraw(bool isOnRightPane, s32 presetsEntryIdx,
     // Draw entry strings.
     for (i = 0; i < ControllerMenuState_Count; i++)
     {
-        Gfx_StringSetPosition(24, STR_BASE_Y + (i * STR_OFFSET_Y));
-        Gfx_StringDraw(CONTROLLER_MENU_PRESETS_PANE_ENTRY_STRINGS[i], 20);
+        Gfx_StringPositionSet(24, STR_BASE_Y + (i * STR_OFFSET_Y));
+        Gfx_StringDraw(PRESETS_PANE_ENTRY_STRS[i], 20);
     }
 
     if (!isOnRightPane)
@@ -2426,7 +2426,7 @@ void Options_ControllerMenu_EntriesDraw(bool isOnRightPane, s32 presetsEntryIdx,
     {
         // Draw action string.
         Text_Debug_PositionSet(96, strYPos);
-        Text_Debug_Draw(CONTROLLER_MENU_ACTIONS_PANE_ENTRY_STRINGS[i]);
+        Text_Debug_Draw(ACTIONS_PANE_ENTRY_STRS[i]);
 
         // Draw button icon.
         if (i != boundActionIdx)

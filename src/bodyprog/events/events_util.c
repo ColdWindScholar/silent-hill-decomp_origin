@@ -162,7 +162,7 @@ void Event_CharaAnimCmdExecute(e_CharaAnimCmd cmd, s_SubCharacter* chara, s32 an
             }
             else
             {
-                g_MapOverlayHdr.charaAnimReset(chara);
+                g_MapOverlayHdr.charaControlStateReset(chara);
             }
             break;
     }
@@ -270,14 +270,16 @@ void Event_ScreenFadeCmd(e_ScreenFadeCmd cmd, bool fadeOut, e_ScreenFadeType fad
                 }
             }
 
-            if (cmd != ScreenFadeCmd_Start) // `cmd` will only be different if `ScreenFadeCmd_Auto` was passed.
+            // `cmd` will only be different if `ScreenFadeCmd_Auto` was passed.
+            if (cmd != ScreenFadeCmd_Start)
             {
                 SysWork_StateStepIncrement(2);
             }
             break;
 
         case ScreenFadeCmd_Wait:
-            if (fadeType < ScreenFadeType_ScreenBorders) // `fadeType == ScreenFadeType_Black || fadeType == ScreenFadeType_White`
+            // `fadeType == ScreenFadeType_Black || fadeType == ScreenFadeType_White`.
+            if (fadeType < ScreenFadeType_ScreenBorders)
             {
                 if ((fadeOut == false && ScreenFade_IsNone()) ||
                     (fadeOut == true  && ScreenFade_IsFinished()))
@@ -295,9 +297,9 @@ void Event_ScreenFadeCmd(e_ScreenFadeCmd cmd, bool fadeOut, e_ScreenFadeType fad
     }
 }
 
-const RECT D_8002AB10 =  // 0x8002AB10 .rodata
+const RECT D_8002AB10 = // 0x8002AB10 .rodata
 {
-    SCREEN_POSITION_X(100.0f), 256,
+    SCREEN_WIDTH, 256,
     (SCREEN_WIDTH / 5) * 3, SCREEN_HEIGHT
 };
 
@@ -577,7 +579,8 @@ void Event_DisplayMapMsgWithAudio(s32 mapMsgIdx, u8* audioIdx, const u16* audioC
     }
 }
 
-void Event_CameraPositionSet(VECTOR3* pos, q19_12 offsetOrPosX, q19_12 offsetOrPosY, q19_12 offsetOrPosZ,
+void Event_CameraPositionSet(VECTOR3* pos,
+                             q19_12 offsetOrPosX, q19_12 offsetOrPosY, q19_12 offsetOrPosZ,
                              q19_12 accelXz, q19_12 accelY, q19_12 speedXzMax, q19_12 speedYMax,
                              bool warp) // 0x80086A94
 {
@@ -642,7 +645,8 @@ void Event_CameraPositionSet(VECTOR3* pos, q19_12 offsetOrPosX, q19_12 offsetOrP
     vcUserCamTarget(&posTarget, &camMoveParams, warp);
 }
 
-void Event_CameraLookAtSet(VECTOR3* lookAt, q19_12 lookAtOffsetOrPosX, q19_12 lookAtOffsetOrPosY, q19_12 lookAtOffsetOrPosZ,
+void Event_CameraLookAtSet(VECTOR3* lookAt,
+                           q19_12 lookAtOffsetOrPosX, q19_12 lookAtOffsetOrPosY, q19_12 lookAtOffsetOrPosZ,
                            q19_12 angularAccelX, q19_12 angularAccelY, q19_12 angularSpeedXMax, q19_12 angularSpeedYMax,
                            bool warp) // 0x80086B70
 {
@@ -985,7 +989,7 @@ void Event_DisplayMapMsgWithDimmedBg(e_FsFile texFileIdx, q19_12 fadeTimestep0, 
         case EventStates_4:
             Event_BgTextureCmd(BgTextureCmd_Draw, 0, false);
 
-            if (mapMsgIdx0 != MapMsgCode_None)
+            if (mapMsgIdx0 != MapMsgReturnCode_None)
             {
                 Event_DisplayMapMsg(false, mapMsgIdx0, 0, 0, 0, true);
                 break;
@@ -993,7 +997,7 @@ void Event_DisplayMapMsgWithDimmedBg(e_FsFile texFileIdx, q19_12 fadeTimestep0, 
 
             // Check for "continue" input.
             if (g_Controller0->buttonFlags.clicked & (g_GameWorkPtr->config.controllerConfig.enter |
-                                                  g_GameWorkPtr->config.controllerConfig.cancel))
+                                                      g_GameWorkPtr->config.controllerConfig.cancel))
             {
                 SysWork_StateStepIncrement(1);
             }
@@ -1144,7 +1148,7 @@ void Event_CommonItemTake(u32 pickupType, e_EventFlag eventFlagIdx) // 0x800879F
 void Event_PaperMapTake(s32 paperMapFlagIdx, e_EventFlag eventFlagIdx, s32 mapMsgIdx) // 0x80087AF4
 {
     static const RECT RECT = {
-        SCREEN_POSITION_X(100.0f), 256,
+        SCREEN_WIDTH, 256,
         SCREEN_WIDTH / 2, SCREEN_HEIGHT
     };
 

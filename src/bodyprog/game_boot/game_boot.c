@@ -20,14 +20,15 @@
 
 void GameState_LoadScreen_Update(void)
 {
+    #define LOAD_COUNT_MAX 20
+
     GameBoot_LoadingScreen();
     GameBoot_InGameStartup();
 
     if (g_SysWork.sysFlags & SysFlag_LoadActive)
     {
-        D_800BCDD4++;
-
-        if (D_800BCDD4 >= 21)
+        g_MapAreaLoadCounter++;
+        if (g_MapAreaLoadCounter > LOAD_COUNT_MAX)
         {
             g_SysWork.sysFlags &= ~SysFlag_LoadActive;
 
@@ -35,6 +36,8 @@ void GameState_LoadScreen_Update(void)
             SD_Call(Sfx_Unk1501);
         }
     }
+
+    #undef LOAD_COUNT_MAX
 }
 
 void GameBoot_InGameStartup(void)
@@ -219,7 +222,7 @@ void GameBoot_InGameStartup(void)
                 if (AreaLoad_TransitionFlags() & AreaTransitionFlag_SkipFadeIn)
                 {
                     g_GameWork.gameStateSteps[0] = 1;
-                    g_Screen_FadeStatus          = SCREEN_FADE_STATUS(ScreenFadeState_ResetTimestep, IS_SCREEN_FADE_WHITE(g_Screen_FadeStatus));
+                    g_ScreenFade_Status          = SCREEN_FADE_STATUS(ScreenFadeState_ResetTimestep, IS_SCREEN_FADE_WHITE(g_ScreenFade_Status));
                 }
             }
             break;
@@ -268,8 +271,8 @@ static void GameBoot_NpcInit(void) // 0x80034F18
 
     if (g_SysWork.field_234A)
     {
-        g_MapOverlayHdr.enviromentSet(g_SysWork.field_2349, 127);
-        g_MapOverlayHdr.particlesUpdate(0, g_SavegamePtr->mapIdx, 0);
+        g_MapOverlayHdr.particleEnviromentSet(g_SysWork.field_2349, 127);
+        g_MapOverlayHdr.particleSystemUpdate(0, g_SavegamePtr->mapIdx, 0);
     }
 
     GameBoot_NpcClear();
@@ -295,11 +298,11 @@ void GameBoot_InGameInit(void) // 0x80034FB8
     WorldGfx_CharaModelProcessAllLoads();
     Game_FlashlightAttributesFix();
 
-    g_MapOverlayHdr.particlesUpdate(0, mapOvlId, NO_VALUE);
+    g_MapOverlayHdr.particleSystemUpdate(0, mapOvlId, NO_VALUE);
 
     GameBoot_NpcClear();
 
-    g_SysWork.npcFlagsId = 5;
+    g_SysWork.npcFlagId = 5;
 
     func_8005E650(mapOvlId);
     func_80037124();

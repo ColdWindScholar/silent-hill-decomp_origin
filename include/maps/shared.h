@@ -31,7 +31,7 @@ typedef struct
  */
 typedef struct _SfxVolume
 {
-    u16 id_0;
+    u16 id;
     union
     {
         u8  val8;
@@ -104,18 +104,6 @@ typedef struct
     u8 field_1;
 } s_800F0158;
 
-typedef struct
-{
-    u16 sfxId;
-    u16 vol;
-} s_SfxPair;
-
-typedef struct
-{
-    SVECTOR3 vec;
-    s16      idx;
-} s_sharedData_800D5AB0_1_s05;
-
 extern s_MapOverlayHdr_94 sharedData_800E30C8_1_s02;
 
 #if defined(MAP_FIELD_4C_COUNT)
@@ -148,26 +136,33 @@ extern VECTOR sharedData_800DD880_0_s01;
 
 /** Could be a padded `VECTOR`, but the ASM for the function `vec = vec` assignments copies only the first 3 fields. */
 extern VECTOR3 sharedData_800DE170_0_s01;
-extern VECTOR3 sharedData_800DE180_0_s01; // Q19.12 player position relevant to Air Screamer.
+extern VECTOR3 g_AirScreamer_HeadTargetPosition;
 extern VECTOR3 sharedData_800DE190_0_s01;
 
 extern s_RayTrace sharedData_800E2330_0_s01;
 
 /** Packed weapon attack. `See `WEAPON_ATTACK`. */
-extern s8 sharedData_800DD59C_0_s00;
+extern s8 g_Player_PrevWeaponAttack;
 
 extern s32 sharedData_800DF1F4_0_s00;
 extern s16 sharedData_800DF1F8_0_s00;
 extern s16 sharedData_800DF1FA_0_s00;
 
+extern u8 sharedData_800EEAC4_2_s00[][4][4];
+extern VECTOR3 sharedData_800F216C_2_s00;
+extern VECTOR3 sharedData_800F217C_2_s00;
+extern VECTOR3 sharedData_800F21BC_2_s00;
+extern VECTOR3 sharedData_800F21CC_2_s00;
+extern VECTOR3 sharedData_800F21DC_2_s00;
+extern VECTOR3 sharedData_800F21EC_2_s00;
+extern VECTOR3 sharedData_800F21FC_2_s00;
+extern VECTOR sharedData_800DE200_0_s01;
+extern VECTOR3 sharedData_800DE210_0_s01;
+extern SVECTOR sharedData_800DE220_0_s01;
+extern MATRIX sharedData_800DE230_0_s01;
+
 /** Something related to rotation. */
 extern s32 sharedData_800E39D8_0_s00;
-
-// Next 4 set by `Stalker_Update`.
-extern q19_12 sharedData_800E3A20_0_s00; // Health.
-extern q19_12 sharedData_800E3A24_0_s00; // Health.
-extern q19_12 sharedData_800E3A28_0_s00;
-extern q19_12 sharedData_800E3A2C_0_s00;
 
 // Used by `Stalker`/`LarvalStalker`.
 extern u8     sharedData_800DD5A6_0_s00;
@@ -175,8 +170,8 @@ extern s32    sharedData_800E39E4_0_s00;
 extern s32    sharedData_800E39E8_0_s00;
 extern s32    sharedData_800E39EC_0_s00[];
 extern u16    sharedData_800E3A0C_0_s00[]; // Angles?
-extern q19_12 sharedData_800E3A18_0_s00;   // Player X position?
-extern q19_12 sharedData_800E3A1C_0_s00;   // Player Z position?
+extern q19_12 g_Stalker_TargetPositionX;
+extern q19_12 g_Stalker_TargetPositionZ;
 
 // Two variables used by `Creeper_Init`.
 extern s8 sharedData_800E57CC_1_s02;
@@ -184,25 +179,6 @@ extern s8 sharedData_800E57CC_1_s02;
 extern s_sharedData_800E21D0_0_s01 sharedData_800E21D0_0_s01;
 
 extern s_func_800D2E04 const sharedData_800CAA98_0_s01; // Used by `AirScreamer_Init` / `sharedFunc_800D2BF4_0_s01`
-
-// Three variables used by `SplitHead_Init`.
-extern q3_12 sharedData_800D8614_1_s05; // Offset X.
-extern q3_12 sharedData_800D8616_1_s05; // Offset Z.
-
-extern s32 sharedData_800D5884_1_s05;
-
-extern s16 sharedData_800D5A8C_1_s05;
-
-extern u8 sharedData_800D5AAE_1_s05;
-extern u8 sharedData_800D5AAF_1_s05;
-
-extern u8       sharedData_800D5CF8_1_s05[9];
-extern u8       sharedData_800D5D08_1_s05[];
-extern VECTOR3  sharedData_800D8618_1_s05[];
-extern SVECTOR3 sharedData_800D5A90_1_s05[]; // Q7.8
-
-extern s_sharedData_800D5AB0_1_s05 sharedData_800D5AB0_1_s05[];
-extern s16                         sharedData_800D5BE0_1_s05[6][3];
 
 extern u8  sharedData_800D16E4_2_s01;
 
@@ -238,20 +214,6 @@ extern u8 sharedData_800CFB3C_0_s02[8];
 extern u8 sharedData_800CFB44_0_s02[8];
 extern u8 sharedData_800CFB4C_0_s02[8];
 extern u8 sharedData_800CFB54_0_s02[8];
-
-/** Q19.12 */
-extern VECTOR3 sharedData_800DE1A0_0_s01;
-
-extern VECTOR3 sharedData_800DE1B0_0_s01;
-
-extern VECTOR3 sharedData_800DE1C0_0_s01;
-
-extern VECTOR3 sharedData_800DE1E0_0_s01;
-
-extern VECTOR3 sharedData_800DE1F0_0_s01; // Q19.12
-
-// Cached collision result for Air Screamer?
-extern s_CollisionResult sharedData_800E2350_0_s01;
 
 // Cached collision result for Cheryl, Dahlia, and the player?
 extern s_CollisionResult sharedData_800E39BC_0_s00;
@@ -353,39 +315,6 @@ extern const char* MAP_MESSAGES[];
 
 extern s_MapOverlayHdr_7C sharedData_800DEE50_1_s01;
 
-extern u8 sharedData_800EEAC4_2_s00[][4][4];
-
-extern VECTOR3 sharedData_800F216C_2_s00;
-
-extern VECTOR3 sharedData_800F217C_2_s00;
-
-extern VECTOR3 sharedData_800F21BC_2_s00;
-
-extern VECTOR3 sharedData_800F21CC_2_s00;
-
-extern VECTOR3 sharedData_800F21DC_2_s00;
-
-extern VECTOR3 sharedData_800F21EC_2_s00;
-
-extern VECTOR3 sharedData_800F21FC_2_s00;
-
-extern VECTOR sharedData_800DE200_0_s01;
-
-extern VECTOR3 sharedData_800DE210_0_s01;
-
-extern SVECTOR sharedData_800DE220_0_s01;
-
-extern MATRIX sharedData_800DE230_0_s01;
-
-extern s32 g_PuppetNurseHurtSfxIdxs[4];
-extern s_SfxPair g_NursePuppetSfxs[18];
-extern u8 g_NursePuppet_AnimSfxs[580];
-extern s32 g_PuppetNurse_AnimStatus0[2];
-extern s32 g_PuppetNurse_AnimStatus1[2];
-extern u8  g_PuppetNurse_AnimStatus2[2];
-extern u8  g_PuppetNurse_AnimStatus3[4];
-extern u8  g_PuppetNurse_AnimStatus4[4];
-
 extern u8      sharedData_800D4CD4_3_s01[][2];
 extern DVECTOR sharedData_800D4D0C_3_s01;
 extern VECTOR3 sharedData_800CB088_3_s01;
@@ -408,22 +337,6 @@ extern u8 sharedData_800ED430_2_s02[];
 
 extern u8 sharedData_800ED43C_2_s02[];
 
-extern s_sharedData_800ED2D4_2_s02 sharedData_800ED2D4_2_s02[];
-
-extern s32 sharedData_800EC950_2_s02;
-
-extern s32 sharedData_800ECA4C_2_s02;
-
-extern s32 sharedData_800ECACC_2_s02;
-
-extern s16 sharedData_800ECB22_2_s02;
-
-extern s16 sharedData_800ECBC2_2_s02;
-
-extern s16 sharedData_800ECBD0_2_s02;
-
-extern s_sharedData_800ED2D4_2_s02 sharedData_800ED314_2_s02[];
-
 extern u8  sharedData_800EFCFC_6_s00[8];
 extern s32 sharedData_800EFD04_6_s00;
 extern u16 sharedData_800EFD08_6_s00[];
@@ -434,8 +347,6 @@ extern s32 sharedData_800ED420_4_s02;   // `e_BgmFlags`
 extern u8 sharedData_800ED424_4_s02[8];
 extern u16 sharedData_800ED42C_4_s02[]; // `e_BgmFlags` | Map room index used for access.
 extern u8 sharedData_800ED458_4_s02[8];
-
-extern void (*g_Romper_ControlFuncs[])(s_SubCharacter* romper);
 
 extern s_BgmLayerLimits sharedData_800D2F18_7_s00;
 extern s_BgmLayerLimits sharedData_800D2F20_7_s00;
@@ -482,13 +393,13 @@ void sharedFunc_800CCE2C_1_s05(s32 arg0, s32 arg1,
 void sharedFunc_800D4408_1_s05(VECTOR3* pos, s32 idx, q23_8 posX, q23_8 posY, q23_8 posZ);
 
 /** NPC-only. Among other things, sets the NPC's anim to anim 3 (which might actually be flags if the field packs more data). */
-void sharedFunc_800D88C0_0_s00(s_SubCharacter* npc, bool cond);
+void Chara_AnimReset(s_SubCharacter* npc, bool cond);
 
 /** NPC-only, sets `controlState` in properties. */
 void Chara_AnimStateSet(s_SubCharacter* npc, s32 controlState);
 
 /** NPC-only, sets `resetControlState` in properties. */
-void Chara_AnimReset(s_SubCharacter* npc);
+void Chara_ControlStateReset(s_SubCharacter* npc);
 
 /** Locks a character's animation. */
 void Chara_AnimLock(s_SubCharacter* chara);
@@ -534,7 +445,8 @@ bool sharedFunc_800CC618_1_s05(POLY_FT4** poly, s32 idx);
 
 bool sharedFunc_800CCF30_1_s05(POLY_FT4** poly, s32 idx);
 
-void sharedFunc_800D88AC_0_s00(s_SubCharacter* npc);
+// Name uncertain.
+void Chara_MovementReset(s_SubCharacter* npc);
 
 /** @brief Gets the playback state of a character's active animation.
  *
@@ -543,10 +455,10 @@ void sharedFunc_800D88AC_0_s00(s_SubCharacter* npc);
  */
 s32 Chara_AnimPlaybackStateGet(s_SubCharacter* chara);
 
-bool sharedFunc_800D9188_0_s00(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx, s32 sfxId);
+bool Npc_SfxPlay(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx, s32 sfxId);
 
 /** Character SFX func. Suggests there's a shared property struct for humanoid NPCs. */
-bool sharedFunc_800D908C_0_s00(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx0, s32 keyframeIdx1, s32 sfxId, s32 pitch);
+bool Npc_FootstepSoundPlay(s32 animStatus, s_SubCharacter* chara, s32 keyframeIdx0, s32 keyframeIdx1, s32 sfxId, s32 pitch);
 
 void sharedFunc_800CCB8C_0_s01(VECTOR* arg0, VECTOR* arg1, s16 arg2, s32 arg3, s16 arg4, s16 arg5, s32 arg6, s32 arg7);
 
